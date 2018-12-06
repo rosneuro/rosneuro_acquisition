@@ -7,9 +7,7 @@ namespace rosneuro {
 	namespace acquisition {
 
 Device::Device(void) {
-	this->devcap_->model		  = nullptr;
-	this->devcap_->id			  = nullptr;
-	this->devcap_->sampling_rate  = 0;
+	this->devname_ = "undefined";
 }
 
 Device::~Device(void) {
@@ -27,6 +25,14 @@ char* Device::GetId(void) {
 
 unsigned int Device::GetSamplingRate(void) {
 	return this->devcap_->sampling_rate;
+}
+
+std::string Device::GetName(void) {
+	return this->devname_;
+}
+
+void Device::Who(void) {
+	printf("[%s] - %s device\n", this->GetName().c_str(), this->GetName().c_str());
 }
 
 

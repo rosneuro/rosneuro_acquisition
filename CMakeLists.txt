@@ -32,7 +32,13 @@ catkin_package(
 add_library(rosneuro_acquisition
 			src/Device.cpp
 			src/EGDDevice.cpp
+			src/DummyDevice.cpp
+			src/DeviceFactory.cpp
 			)
 add_dependencies(rosneuro_acquisition rosneuro_acquisition_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rosneuro_acquisition ${catkin_LIBRARIES} ${EEGDEV_LIBRARIES})
+
+add_executable(test_devicefactory src/test_devicefactory.cpp)
+target_link_libraries(test_devicefactory rosneuro_acquisition)
+
 

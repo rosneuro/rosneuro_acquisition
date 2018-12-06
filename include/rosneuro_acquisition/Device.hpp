@@ -29,9 +29,13 @@ class Device {
 		virtual char* GetModel(void);
 		virtual char* GetId(void);
 		virtual unsigned int GetSamplingRate(void);
+		virtual std::string GetName(void);
+		
+		virtual void Who(void);
 
 	protected:
 		DevCapabilities* devcap_;
+		std::string		 devname_;
 
 };
 

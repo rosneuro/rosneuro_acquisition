@@ -15,6 +15,7 @@ EGDDevice::EGDDevice(void) {
 	this->frames_ = 0;
 
 	this->egdcap_ = (EGDCapabilities*)this->devcap_;
+	this->devname_ = "eegdev";
 }
 
 EGDDevice::~EGDDevice(void) {
@@ -135,10 +136,13 @@ bool EGDDevice::Open(const std::string& devname) {
 	else if(devname.find(".gdf") != std::string::npos) 
 		devnamearg.assign("datafile|path|");
 	devnamearg.append(devname);
+	
+	this->devname_ = devnamearg;
 
-	this->egddev_ = egd_open(devnamearg.c_str());
+	this->egddev_ = egd_open(this->devname_.c_str());
 	if(this->egddev_ == nullptr) {
-		std::cerr<<"Cannot open the device: " << std::strerror(errno) <<std::endl;
+		std::cerr<<"[Error] - Cannot open the device '"<< this->GetName() <<"': "
+				 << std::strerror(errno) <<std::endl;
 		return false;
 	}
 
@@ -153,7 +157,8 @@ bool EGDDevice::Open(const std::string& devname) {
 
 bool EGDDevice::Close(void) {
 	if(egd_close(this->egddev_) == -1) {
-		std::cerr<<"Cannot close device: " << std::strerror(errno)<<std::endl;
+		std::cerr<<"[Error] - Cannot close the device '" << this->GetName() <<"': "
+			     << std::strerror(errno)<<std::endl;
 		return false;
 	}
 	
@@ -165,7 +170,8 @@ bool EGDDevice::Close(void) {
 		
 bool EGDDevice::Start(void) {
 	if(egd_start(this->egddev_) == -1) { 
-		std::cerr<<"Cannot start device: " << std::strerror(errno) << std::endl;
+		std::cerr<<"[Error] - Cannot start the device '" << this->GetName() <<"': "
+			     << std::strerror(errno) << std::endl;
 		return false;
 	}
 	return true;
@@ -173,7 +179,8 @@ bool EGDDevice::Start(void) {
 
 bool EGDDevice::Stop(void) {
 	if(egd_stop(this->egddev_) == -1) { 
-		std::cerr<<"Cannot stop device: " << std::strerror(errno) <<std::endl;
+		std::cerr<<"[Error] - Cannot stop the device '" << this->GetName() << "': "
+			     << std::strerror(errno) <<std::endl;
 		return false;
 	}
 	return true;
@@ -192,7 +199,8 @@ size_t EGDDevice::SizeEGD(int egdtype) {
 			size = sizeof(double);
 			break;
 		default:
-			std::cout << "EGD type not known (" << egdtype << ": forcing EGD_FLOAT" << std::endl;
+			std::cout << "[Warning] - EGD type not known (" << egdtype 
+				      << ": forcing EGD_FLOAT" << std::endl;
 			size = sizeof(float);
 	}
 	return size;
