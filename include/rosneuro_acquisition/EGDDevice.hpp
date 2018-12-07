@@ -11,12 +11,15 @@
 namespace rosneuro {
 	namespace acquisition {
 
-struct EGDCapabilities : DevCapabilities {
-	unsigned int eeg_nmax;
-    unsigned int sensor_nmax;
-    unsigned int trigger_nmax;
-	char*		 prefiltering;
-};
+typedef struct EGDCapabilities_struct {
+	std::string  model;
+	std::string  id;
+	int sampling_rate;
+	int eeg_nmax;
+    int sensor_nmax;
+    int trigger_nmax;
+	std::string	 prefiltering;
+} EGDCapabilities;
 
 class EGDDevice : public Device {
 
@@ -32,8 +35,10 @@ class EGDDevice : public Device {
 		size_t GetData(void);
 		size_t GetAvailable(void);
 
-		const char* GetPrefiltering(void);
+		const std::string GetPrefiltering(void);
 		const char*** GetLabels(void);
+		
+		void Dump(void);
 			
 	protected:
 		void InitCapabilities(void);

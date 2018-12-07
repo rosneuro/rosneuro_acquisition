@@ -14,8 +14,8 @@ EGDDevice::EGDDevice(void) {
 	this->tri_    = nullptr;
 	this->frames_ = 0;
 
-	this->egdcap_ = (EGDCapabilities*)this->devcap_;
-	this->devname_ = "eegdev";
+	this->egdcap_ = nullptr;
+	this->name_   = "eegdev";
 }
 
 EGDDevice::~EGDDevice(void) {
@@ -42,14 +42,42 @@ EGDDevice::~EGDDevice(void) {
 void EGDDevice::InitCapabilities(void) {
 	// Note by L.Tonin  <luca.tonin@epfl.ch> on 06/12/18 13:48:52	
 	// TODO: To handle return error from egd_get functions
-	
-	egd_get_cap(this->egddev_, EGD_CAP_FS, &this->egdcap_->sampling_rate);
-	egd_get_cap(this->egddev_, EGD_CAP_DEVTYPE, &this->egdcap_->model);
-	egd_get_cap(this->egddev_, EGD_CAP_DEVID, &this->egdcap_->id);
-	this->egdcap_->eeg_nmax = egd_get_numch(this->egddev_, EGD_EEG);
-	this->egdcap_->trigger_nmax = egd_get_numch(this->egddev_, EGD_TRIGGER);
-	this->egdcap_->sensor_nmax = egd_get_numch(this->egddev_, EGD_SENSOR);
-	egd_channel_info(this->egddev_, EGD_EEG, 0, EGD_PREFILTERING, this->egdcap_->prefiltering, EGD_EOL);
+
+	char* model			= nullptr;
+	char* id			= nullptr;
+	char prefiltering[128];
+
+	this->egdcap_->eeg_nmax = 3;
+	printf("Pre num eeg: %d\n", this->egdcap_->eeg_nmax);
+	if(egd_get_cap(this->egddev_, EGD_CAP_FS, &this->egdcap_->sampling_rate) == -1)
+		std::cerr<<"[Error] - Cannot get device sampling rate: " << std::strerror(errno)<<std::endl;
+
+	if(egd_get_cap(this->egddev_, EGD_CAP_DEVTYPE, &model) == -1)
+		std::cerr<<"[Error] - Cannot get device model: " << std::strerror(errno)<<std::endl;
+
+	if(egd_get_cap(this->egddev_, EGD_CAP_DEVID, &id) == -1)
+		std::cerr<<"[Error] - Cannot get device id: " << std::strerror(errno)<<std::endl;
+
+	if(this->egdcap_->eeg_nmax = egd_get_numch(this->egddev_, egd_sensor_type("eeg")) == -1)
+		std::cerr<<"[Error] - Cannot get number eeg channels: " << std::strerror(errno)<<std::endl;
+
+	if(this->egdcap_->trigger_nmax = egd_get_numch(this->egddev_, EGD_TRIGGER) == -1) 
+		std::cerr<<"[Error] - Cannot get number trigger channels: " << std::strerror(errno)<<std::endl;
+
+	if(this->egdcap_->sensor_nmax = egd_get_numch(this->egddev_, EGD_SENSOR) == -1)
+		std::cerr<<"[Error] - Cannot get number sensor channels: " << std::strerror(errno)<<std::endl;
+
+	if(egd_channel_info(this->egddev_, EGD_EEG, 0, EGD_PREFILTERING, &prefiltering, EGD_EOL) == -1)
+		std::cerr<<"[Error] - Cannot get channel info: " << std::strerror(errno)<<std::endl;
+
+	printf("Num eeg: %d\n", this->egdcap_->eeg_nmax);
+
+	if(model != nullptr)
+		this->egdcap_->model = std::string(model);
+	if(id != nullptr)
+		this->egdcap_->id = std::string(id);
+	if(prefiltering != nullptr)
+		this->egdcap_->prefiltering = std::string(prefiltering);
 }
 
 void EGDDevice::InitBuffers(void) {
@@ -137,20 +165,19 @@ bool EGDDevice::Open(const std::string& devname) {
 		devnamearg.assign("datafile|path|");
 	devnamearg.append(devname);
 	
-	this->devname_ = devnamearg;
+	this->name_ = devnamearg;
 
-	this->egddev_ = egd_open(this->devname_.c_str());
-	if(this->egddev_ == nullptr) {
+	this->egddev_ = egd_open(this->name_.c_str());
+	if(this->egddev_ == NULL) {
 		std::cerr<<"[Error] - Cannot open the device '"<< this->GetName() <<"': "
 				 << std::strerror(errno) <<std::endl;
 		return false;
 	}
 
-	if(this->egdcap_ != nullptr)
-		delete this->egdcap_;
+	//if(this->egdcap_ != nullptr)
+	//	delete this->egdcap_;
 
-	this->devcap_ = new DevCapabilities;
-	this->egdcap_ = (EGDCapabilities*)this->devcap_;
+	this->egdcap_ = new EGDCapabilities();
 
 	return true;
 }
@@ -215,12 +242,24 @@ size_t EGDDevice::GetAvailable(void) {
 	return egd_get_available(this->egddev_);
 }
 
-const char* EGDDevice::GetPrefiltering(void) {
+const std::string EGDDevice::GetPrefiltering(void) {
 	return this->egdcap_->prefiltering;
 }
 
 const char*** EGDDevice::GetLabels(void) {
 	return (const char***)this->labels_;
+}
+
+void EGDDevice::Dump(void) {
+	printf("[Dump] Device info:\n");
+	printf(" + Capabilities:\n");
+	printf(" |- Device:       %s\n",	this->egdcap_->model.c_str());
+	printf(" |- Id:           %s\n",	this->egdcap_->id.c_str());
+	printf(" |- Sf:           %d Hz\n", this->egdcap_->sampling_rate);
+	printf(" |- Channels:     %d\n",	this->egdcap_->eeg_nmax);
+	printf(" |- Sensors:      %d\n",	this->egdcap_->sensor_nmax);
+	printf(" |- Triggers:     %d\n",	this->egdcap_->trigger_nmax);
+	printf(" |- Prefiltering: %s\n",	this->egdcap_->prefiltering.c_str());
 }
 
 	}

@@ -7,28 +7,28 @@ namespace rosneuro {
 	namespace acquisition {
 
 Device::Device(void) {
-	this->devname_ = "undefined";
+	this->name_  = "undefined";
+	this->model_ = "undefined";
+	this->id_	 = "undefined";
+	this->sampling_rate_ = 0;
 }
 
-Device::~Device(void) {
-	if(this->devcap_ != nullptr)
-		delete this->devcap_;
+Device::~Device(void) {}
+
+std::string Device::GetModel(void) {
+	return this->model_;
 }
 
-char* Device::GetModel(void) {
-	return this->devcap_->model;
-}
-
-char* Device::GetId(void) {
-	return this->devcap_->id;
+std::string Device::GetId(void) {
+	return this->id_;
 }
 
 unsigned int Device::GetSamplingRate(void) {
-	return this->devcap_->sampling_rate;
+	return this->sampling_rate_;
 }
 
 std::string Device::GetName(void) {
-	return this->devname_;
+	return this->name_;
 }
 
 void Device::Who(void) {

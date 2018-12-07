@@ -6,12 +6,6 @@
 namespace rosneuro {
 	namespace acquisition {
 
-struct DevCapabilities {
-	char*		 model;
-	char*		 id;
-	unsigned int sampling_rate;
-};
-
 class Device {
 	
 	public:
@@ -26,16 +20,20 @@ class Device {
 		virtual size_t GetData(void) = 0;
 		virtual size_t GetAvailable(void) = 0;
 
-		virtual char* GetModel(void);
-		virtual char* GetId(void);
+		virtual std::string GetModel(void);
+		virtual std::string GetId(void);
 		virtual unsigned int GetSamplingRate(void);
 		virtual std::string GetName(void);
 		
 		virtual void Who(void);
 
+		virtual void Dump(void) {};
+
 	protected:
-		DevCapabilities* devcap_;
-		std::string		 devname_;
+		std::string		name_;
+		std::string		model_;
+		std::string		id_;
+		unsigned int	sampling_rate_;
 
 };
 

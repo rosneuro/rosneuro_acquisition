@@ -41,4 +41,7 @@ target_link_libraries(rosneuro_acquisition ${catkin_LIBRARIES} ${EEGDEV_LIBRARIE
 add_executable(test_devicefactory src/test_devicefactory.cpp)
 target_link_libraries(test_devicefactory rosneuro_acquisition)
 
+add_executable(test_egddevice src/test_egddevice.cpp)
+target_link_libraries(test_egddevice rosneuro_acquisition)
+
 

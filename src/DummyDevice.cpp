@@ -7,7 +7,7 @@ namespace rosneuro {
 	namespace acquisition {
 
 DummyDevice::DummyDevice(void) {
-	this->devname_ = "dummy";
+	this->name_ = "dummy";
 }
 DummyDevice::~DummyDevice(void) {}
 
@@ -17,7 +17,7 @@ bool DummyDevice::Setup(float fs) {
 }
 
 bool DummyDevice::Open(const std::string& devname) {
-	this->devname_ = devname;
+	this->name_ = devname;
 	printf("[%s] - Device open\n", this->GetName().c_str());
 	return true;
 }
