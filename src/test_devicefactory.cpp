@@ -7,8 +7,8 @@ int main(int argc, char** argv) {
 
 	DeviceFactory factory;
 
-	std::unique_ptr<Device> egddev   = factory.createDevice(DeviceType::EGD_DEVICE);
-	std::unique_ptr<Device> dummydev = factory.createDevice(DeviceType::DUMMY_DEVICE);
+	std::unique_ptr<Device> egddev   = factory.createDevice(DeviceType::EGDDEV);
+	std::unique_ptr<Device> dummydev = factory.createDevice(DeviceType::DUMMYDEV);
 	std::unique_ptr<Device> xxxdev   = factory.createDevice(666);
 	
 

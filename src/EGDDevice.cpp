@@ -7,18 +7,87 @@ namespace rosneuro {
 	namespace acquisition {
 
 EGDDevice::EGDDevice(void) {
-	memset(this->grp_, 0, 3*sizeof(struct grpconf));
-	memset(this->strides_, 0, 3*sizeof(size_t));
+	
+	this->ngrp_ = EGD_DEFAULT_GROUP_NUMBER;
+	this->init_egd_capabilities();
+	this->init_egd_groups();
+	this->init_egd_strides();
+	this->init_egd_labels();
+	this->init_egd_data();
+	
+	//memset(this->grp_, 0, 3*sizeof(struct grpconf));
+	//memset(this->strides_, 0, 3*sizeof(size_t));
+	//this->eeg_	  = nullptr;
+	//this->exg_	  = nullptr;
+	//this->tri_    = nullptr;
+	//this->frames_ = 0;
+
+	//this->egddev_ = NULL;
+	//this->egdcap_ = nullptr;
+	//this->name_   = "eegdev";
+
+	//unsigned int igrp, i;
+	//for (igrp=0; igrp<3; igrp++) 
+	//	this->labels_[igrp] = nullptr;
+}
+
+EGDDevice::~EGDDevice(void) {
+
+
+	this->destroy_egd_data();
+	this->destroy_egd_cababilities();
+	this->destroy_egd_strides();
+	this->destroy_egd_labels();
+	this->destroy_egd_groups();
+
+
+	//if(this->eeg_ != nullptr)
+	//	free(this->eeg_);
+	//if(this->exg_ != nullptr)
+	//	free(this->exg_);
+	//if(this->tri_ != nullptr)
+	//	free(this->tri_);
+
+	//// Free labels
+	//unsigned int igrp, i;
+	//for (igrp=0; igrp<2; igrp++) {
+	//	if (this->labels_[igrp] == nullptr)
+	//		continue;
+	//	for (i=0; i<this->grp_[igrp].nch; i++) 
+	//		free(this->labels_[igrp][i]);
+
+	//	free(this->labels_[igrp]);
+	//	this->labels_[igrp] = nullptr;
+	//}
+}
+
+void EGDDevice::init_egd_capabilities(void) {
+	this->egdcap_ = nullptr;
+}
+
+void EGDDevice::init_egd_groups(void) {
+	this->grp_ = (grpconf*)malloc(this->ngrp_ * sizeof(grpconf));
+	memset(this->grp_, 0, this->ngrp_*sizeof(struct grpconf));
+}
+
+void EGDDevice::init_egd_labels(void) {
+	this->labels_ = (char***)malloc(this->ngrp_ * sizeof(char**));
+	memset(this->labels_, 0, this->ngrp_*sizeof(char**));
+}
+
+void EGDDevice::init_egd_strides(void) {
+	this->strides_ = (size_t*)malloc(this->ngrp_ * sizeof(size_t));
+	memset(this->strides_, 0, this->ngrp_ *sizeof(size_t));
+}
+
+void EGDDevice::init_egd_data(void) {
 	this->eeg_	  = nullptr;
 	this->exg_	  = nullptr;
 	this->tri_    = nullptr;
 	this->frames_ = 0;
-
-	this->egdcap_ = nullptr;
-	this->name_   = "eegdev";
 }
 
-EGDDevice::~EGDDevice(void) {
+void EGDDevice::destroy_egd_data(void) {
 	if(this->eeg_ != nullptr)
 		free(this->eeg_);
 	if(this->exg_ != nullptr)
@@ -26,58 +95,103 @@ EGDDevice::~EGDDevice(void) {
 	if(this->tri_ != nullptr)
 		free(this->tri_);
 
-	// Free labels
+	this->frames_ = 0;
+}
+
+void EGDDevice::destroy_egd_cababilities(void) {
+	if(this->egdcap_ != nullptr)
+		delete egdcap_;
+}
+
+
+void EGDDevice::destroy_egd_strides(void) {
+	if(this->strides_ != nullptr)
+		free(this->strides_);
+}
+
+void EGDDevice::destroy_egd_labels(void) {
+
 	unsigned int igrp, i;
-	for (igrp=0; igrp<2; igrp++) {
-		if (this->labels_[igrp] == nullptr)
-			continue;
+	
+	for (igrp=0; igrp<3; igrp++) {
 		for (i=0; i<this->grp_[igrp].nch; i++) 
 			free(this->labels_[igrp][i]);
 
 		free(this->labels_[igrp]);
-		this->labels_[igrp] = nullptr;
 	}
+
+	free(this->labels_);
 }
 
-void EGDDevice::InitCapabilities(void) {
-	// Note by L.Tonin  <luca.tonin@epfl.ch> on 06/12/18 13:48:52	
-	// TODO: To handle return error from egd_get functions
+void EGDDevice::destroy_egd_groups(void) {
+	if(this->grp_ != nullptr)
+		free(this->grp_);
+}
+
+
+
+bool EGDDevice::InitCapabilities(void) {
 
 	char* model			= nullptr;
 	char* id			= nullptr;
+	unsigned int fs		= 0; 
+	unsigned int neeg	= 0;
+	unsigned int ntri	= 0;
+	unsigned int nsen	= 0;
 	char prefiltering[128];
 
-	this->egdcap_->eeg_nmax = 3;
-	printf("Pre num eeg: %d\n", this->egdcap_->eeg_nmax);
-	if(egd_get_cap(this->egddev_, EGD_CAP_FS, &this->egdcap_->sampling_rate) == -1)
-		std::cerr<<"[Error] - Cannot get device sampling rate: " << std::strerror(errno)<<std::endl;
+	// Getting sampling rate
+	if(egd_get_cap(this->egddev_, EGD_CAP_FS, &fs) == -1) {
+		std::cerr<<"[Error] - Cannot get sampling rate: "<<strerror(errno)<<std::endl;
+		return false;
+	}
 
-	if(egd_get_cap(this->egddev_, EGD_CAP_DEVTYPE, &model) == -1)
-		std::cerr<<"[Error] - Cannot get device model: " << std::strerror(errno)<<std::endl;
+	// Getting devtype
+	if(egd_get_cap(this->egddev_, EGD_CAP_DEVTYPE, &model) == -1) {
+		std::cerr<<"[Error] - Cannot get device type: "<<strerror(errno)<<std::endl;
+		return false;
+	}
 
-	if(egd_get_cap(this->egddev_, EGD_CAP_DEVID, &id) == -1)
-		std::cerr<<"[Error] - Cannot get device id: " << std::strerror(errno)<<std::endl;
+	// Getting devid
+	if(egd_get_cap(this->egddev_, EGD_CAP_DEVID, &id) == -1) {
+		std::cerr<<"[Error] - Cannot get device id: "<<strerror(errno)<<std::endl;
+		return false;
+	}
 
-	if(this->egdcap_->eeg_nmax = egd_get_numch(this->egddev_, egd_sensor_type("eeg")) == -1)
-		std::cerr<<"[Error] - Cannot get number eeg channels: " << std::strerror(errno)<<std::endl;
+	// Getting number EEG
+	if( (neeg = egd_get_numch(this->egddev_, EGD_EEG)) == -1) {
+		std::cerr<<"[Error] - Cannot get number EEG channels: "<<strerror(errno)<<std::endl;
+		return false;
+	}
 
-	if(this->egdcap_->trigger_nmax = egd_get_numch(this->egddev_, EGD_TRIGGER) == -1) 
-		std::cerr<<"[Error] - Cannot get number trigger channels: " << std::strerror(errno)<<std::endl;
+	// Getting number TRIGGER
+	if( (ntri = egd_get_numch(this->egddev_, EGD_TRIGGER)) == -1) {
+		std::cerr<<"[Error] - Cannot get number TRIGGER channels: "<<strerror(errno)<<std::endl;
+		return false;
+	}
 
-	if(this->egdcap_->sensor_nmax = egd_get_numch(this->egddev_, EGD_SENSOR) == -1)
-		std::cerr<<"[Error] - Cannot get number sensor channels: " << std::strerror(errno)<<std::endl;
+	// Getting number SENSOR
+	if( (nsen = egd_get_numch(this->egddev_, EGD_SENSOR)) == -1) {
+		std::cerr<<"[Error] - Cannot get number SENSOR channels: "<<strerror(errno)<<std::endl;
+		return false;
+	}
+	
+	// Getting prefiltering
+	if( egd_channel_info(this->egddev_, EGD_EEG, 0, EGD_PREFILTERING, &prefiltering, EGD_EOL) == -1) {
+		std::cerr<<"[Error] - Cannot get prefiltering: "<<strerror(errno)<<std::endl;
+		return false;
+	}
 
-	if(egd_channel_info(this->egddev_, EGD_EEG, 0, EGD_PREFILTERING, &prefiltering, EGD_EOL) == -1)
-		std::cerr<<"[Error] - Cannot get channel info: " << std::strerror(errno)<<std::endl;
+	// Populating device capabilities structure
+	this->egdcap_->sampling_rate = fs;
+	this->egdcap_->eeg_nmax		 = neeg;
+	this->egdcap_->trigger_nmax  = ntri;
+	this->egdcap_->sensor_nmax   = nsen;
+	this->egdcap_->model		 = std::string(model);
+	this->egdcap_->id			 = std::string(id);
+	this->egdcap_->prefiltering  = std::string(prefiltering);
 
-	printf("Num eeg: %d\n", this->egdcap_->eeg_nmax);
-
-	if(model != nullptr)
-		this->egdcap_->model = std::string(model);
-	if(id != nullptr)
-		this->egdcap_->id = std::string(id);
-	if(prefiltering != nullptr)
-		this->egdcap_->prefiltering = std::string(prefiltering);
+	return true;
 }
 
 void EGDDevice::InitBuffers(void) {
@@ -129,7 +243,9 @@ bool EGDDevice::Setup(float hz) {
 	// Note by L.Tonin  <luca.tonin@epfl.ch> on 06/12/18 13:57:10
 	// TODO: Handle setup error 
 
-	this->InitCapabilities();
+	if(this->InitCapabilities() == false)
+		return false;
+
 	this->InitFrame(hz);
 	this->InitGroups();
 	this->InitBuffers();
@@ -165,10 +281,9 @@ bool EGDDevice::Open(const std::string& devname) {
 		devnamearg.assign("datafile|path|");
 	devnamearg.append(devname);
 	
-	this->name_ = devnamearg;
+	this->name_ = devname;
 
-	this->egddev_ = egd_open(this->name_.c_str());
-	if(this->egddev_ == NULL) {
+	if(!(this->egddev_ = egd_open(devnamearg.c_str()))) {
 		std::cerr<<"[Error] - Cannot open the device '"<< this->GetName() <<"': "
 				 << std::strerror(errno) <<std::endl;
 		return false;
@@ -176,6 +291,7 @@ bool EGDDevice::Open(const std::string& devname) {
 
 	//if(this->egdcap_ != nullptr)
 	//	delete this->egdcap_;
+	this->destroy_egd_cababilities();
 
 	this->egdcap_ = new EGDCapabilities();
 
@@ -189,8 +305,7 @@ bool EGDDevice::Close(void) {
 		return false;
 	}
 	
-	if(this->egdcap_ != nullptr)
-		delete this->egdcap_;
+	this->destroy_egd_cababilities();
 
 	return true;
 }

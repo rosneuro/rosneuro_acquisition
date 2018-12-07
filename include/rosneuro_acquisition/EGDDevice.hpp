@@ -8,18 +8,20 @@
 #include <eegdev.h>
 #include "rosneuro_acquisition/Device.hpp"
 
+#define EGD_DEFAULT_GROUP_NUMBER 3
+
 namespace rosneuro {
 	namespace acquisition {
 
-typedef struct EGDCapabilities_struct {
+struct EGDCapabilities {
 	std::string  model;
 	std::string  id;
-	int sampling_rate;
-	int eeg_nmax;
-    int sensor_nmax;
-    int trigger_nmax;
+	unsigned int sampling_rate;
+	unsigned int eeg_nmax;
+    unsigned int sensor_nmax;
+    unsigned int trigger_nmax;
 	std::string	 prefiltering;
-} EGDCapabilities;
+};
 
 class EGDDevice : public Device {
 
@@ -41,21 +43,40 @@ class EGDDevice : public Device {
 		void Dump(void);
 			
 	protected:
-		void InitCapabilities(void);
+		virtual void init_egd_capabilities(void);
+		virtual void init_egd_groups(void);
+		virtual void init_egd_strides(void);
+		virtual void init_egd_labels(void);
+		virtual void init_egd_data(void);
+
+		virtual bool setup_egd_capabilities(void) {};
+		virtual bool setup_egd_groups(void) {};
+		virtual bool setup_egd_strides(void) {};
+		virtual bool setup_egd_data(void) {};
+		virtual bool setup_egd_labels(void) {};
+
+		virtual void destroy_egd_data(void);
+		virtual void destroy_egd_cababilities(void);
+		virtual void destroy_egd_strides(void);
+		virtual void destroy_egd_labels(void);
+		virtual void destroy_egd_groups(void);
+
+		bool InitCapabilities(void);
 		void InitGroups(void);
 		void InitBuffers(void);
 		void InitFrame(float hz);
 		size_t SizeEGD(int egdtype);
 
-	private:
+	protected:
 		struct  eegdev*	egddev_;
-		struct	grpconf grp_[3];
-		size_t	strides_[3];
+		struct	grpconf* grp_;
+		size_t*	strides_;
+		char***	labels_;
 		void*	eeg_;
 		void*	exg_;
 		void*	tri_;
 		size_t	frames_;
-		char**	labels_[3];
+		unsigned int ngrp_;
 		EGDCapabilities* egdcap_;
 };
 

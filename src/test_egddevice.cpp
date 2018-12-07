@@ -1,22 +1,23 @@
 #include "rosneuro_acquisition/EGDDevice.hpp"
 
 #include <unistd.h>
-using namespace rosneuro::acquisition;
 
 int main(int argc, char** argv) {
 
 
 
-	EGDDevice egddev;
+	rosneuro::acquisition::EGDDevice egddev;
 
 
-	if(egddev.Open("/home/ltonin/Desktop/test.bdf") == false)
+	//if(egddev.Open("gtec") == false)
+	if(egddev.Open(argv[1]) == false)
 		return -1;
 		
 	sleep(1);
 	
-	if(egddev.Setup(16) == false)
+	if(egddev.Setup(16.0f) == false) {
 		return -1;
+	}
 
 
 	egddev.Dump();

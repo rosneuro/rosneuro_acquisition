@@ -9,12 +9,12 @@
 namespace rosneuro {
 	namespace acquisition {
 
-enum DeviceType {EGD_DEVICE, DUMMY_DEVICE};
+enum DeviceType {EGDDEV, DUMMYDEV};
 
 class DeviceFactory {
 
 	public:
-		std::unique_ptr<Device> createDevice(unsigned int type = DeviceType::EGD_DEVICE);
+		std::unique_ptr<Device> createDevice(unsigned int type = DeviceType::EGDDEV);
 
 };
 

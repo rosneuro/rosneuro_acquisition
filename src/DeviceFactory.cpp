@@ -10,10 +10,10 @@ std::unique_ptr<Device> DeviceFactory::createDevice(unsigned int type) {
 
 	std::unique_ptr<Device> dev;
 	switch(type) {
-		case DeviceType::EGD_DEVICE:
+		case DeviceType::EGDDEV:
 			dev = std::unique_ptr<EGDDevice>(new EGDDevice);
 			break;
-		case DeviceType::DUMMY_DEVICE:
+		case DeviceType::DUMMYDEV:
 			dev = std::unique_ptr<DummyDevice>(new DummyDevice);
 			break;
 		default:
