@@ -7,7 +7,6 @@ namespace rosneuro {
 
 EGDDevice::EGDDevice(void) {
 	
-	this->data_ = new DeviceData;
 	this->name_ = "egddev";
 	this->ngrp_ = EGD_DEFAULT_GROUP_NUMBER;
 	this->init_egd_capabilities();
@@ -26,11 +25,24 @@ EGDDevice::~EGDDevice(void) {
 
 bool EGDDevice::Setup(float hz) {
 
+	this->init_egd_capabilities();
+	this->init_egd_groups();
+	this->init_egd_strides();
+	this->init_egd_data();
+
+	
+	
 	// Setup structures
 	if(this->setup_egd_capabilities() == false) {
 		std::cerr<<"[Error] - Cannot setup capabilities"<<std::endl; 
 		return false;
 	}
+	
+	if(this->setup_egd_frame(hz) == false) {
+		std::cerr<<"[Error] - Cannot setup frame"<<std::endl; 
+		return false;
+	}
+	
 	if(this->setup_egd_groups() == false) {
 		std::cerr<<"[Error] - Cannot setup group"<<std::endl; 
 		return false;
@@ -48,10 +60,6 @@ bool EGDDevice::Setup(float hz) {
 		return false;
 	}
 
-	if(this->setup_egd_frame(hz) == false) {
-		std::cerr<<"[Error] - Cannot setup frame"<<std::endl; 
-		return false;
-	}
 	
 	// Setup egd device
 	if(egd_acq_setup(this->egddev_, 3, this->strides_, 3, this->grp_) == -1) {
@@ -80,8 +88,6 @@ bool EGDDevice::Open(const std::string& devname) {
 		return false;
 	}
 
-	this->destroy_egd_cababilities();
-	this->egdcap_ = new EGDCapabilities();
 
 	return true;
 }
@@ -93,7 +99,10 @@ bool EGDDevice::Close(void) {
 		return false;
 	}
 	
+	this->destroy_egd_data();
 	this->destroy_egd_cababilities();
+	this->destroy_egd_strides();
+	this->destroy_egd_groups();
 
 	return true;
 }
@@ -117,9 +126,17 @@ bool EGDDevice::Stop(void) {
 }
 
 size_t EGDDevice::GetData(DeviceData* data) {
-	return egd_get_data(this->egddev_, this->data_->sframe, 
-			this->data_->eeg, this->data_->exg, this->data_->tri);
-	data = this->data_;
+	size_t size;
+	size = egd_get_data(this->egddev_, this->data_.sframe, 
+						this->data_.eeg, this->data_.exg, this->data_.tri);
+	if (size == -1) {
+		std::cerr<<"Error reading data: " << std::strerror(errno) << std::endl;
+		data = nullptr;
+	} else {
+		data = &(this->data_);
+	}
+
+	return size;
 }
 		
 size_t EGDDevice::GetAvailable(void) {
@@ -137,16 +154,16 @@ void EGDDevice::Dump(void) {
 	printf(" |- Device:       %s\n",	this->egdcap_->model.c_str());
 	printf(" |- Id:           %s\n",	this->egdcap_->id.c_str());
 	printf(" |- Sf:           %d Hz\n", this->egdcap_->sampling_rate);
-	printf(" |- Channels:     %d\n",	this->data_->neeg);
-	printf(" |- Sensors:      %d\n",	this->data_->nexg);
-	printf(" |- Triggers:     %d\n",	this->data_->ntri);
+	printf(" |- Channels:     %d\n",	this->data_.neeg);
+	printf(" |- Sensors:      %d\n",	this->data_.nexg);
+	printf(" |- Triggers:     %d\n",	this->data_.ntri);
 	printf(" |- Prefiltering: %s\n",	this->egdcap_->prefiltering.c_str());
 	printf(" |- EEG labels: ");
 	for(auto i=0; i<this->grp_[0].nch; i++)
-		printf("%s ", this->data_->leeg[i]);
+		printf("%s ", this->data_.leeg[i]);
 	printf("\n |- Sensors labels: ");
 	for(auto i=0; i<this->grp_[1].nch; i++)
-		printf("%s ", this->data_->lexg[i]);
+		printf("%s ", this->data_.lexg[i]);
 	printf("\n");
 }
 
@@ -156,10 +173,11 @@ void EGDDevice::Dump(void) {
 /*********************************************************************/
 
 void EGDDevice::init_egd_capabilities(void) {
-	this->egdcap_ = nullptr;
+	this->egdcap_ = new EGDCapabilities();
 }
 
 void EGDDevice::init_egd_groups(void) {
+
 	this->grp_ = (grpconf*)malloc(this->ngrp_ * sizeof(grpconf));
 	memset(this->grp_, 0, this->ngrp_*sizeof(struct grpconf));
 }
@@ -171,72 +189,20 @@ void EGDDevice::init_egd_strides(void) {
 }
 
 void EGDDevice::init_egd_data(void) {
-	this->data_->neeg	= 0;
-	this->data_->nexg	= 0;
-	this->data_->ntri	= 0;
-	this->data_->seeg	= 0;
-	this->data_->sexg	= 0;
-	this->data_->stri	= 0;
-	this->data_->eeg	= nullptr;
-	this->data_->exg  	= nullptr;
-	this->data_->tri	= nullptr;
-	this->data_->sframe	= 0;
-	this->data_->leeg	= nullptr;
-	this->data_->lexg 	= nullptr;
+	this->data_.neeg	= 0;
+	this->data_.nexg	= 0;
+	this->data_.ntri	= 0;
+	this->data_.seeg	= 0;
+	this->data_.sexg	= 0;
+	this->data_.stri	= 0;
+	this->data_.eeg	= nullptr;
+	this->data_.exg  	= nullptr;
+	this->data_.tri	= nullptr;
+	this->data_.sframe	= 0;
+	this->data_.leeg	= nullptr;
+	this->data_.lexg 	= nullptr;
 }
 
-void EGDDevice::destroy_egd_data(void) {
-	if(this->data_->eeg != nullptr)
-		free(this->data_->eeg);
-	if(this->data_->exg != nullptr)
-		free(this->data_->exg);
-	if(this->data_->tri != nullptr)
-		free(this->data_->tri);
-
-	this->destroy_egd_labels();
-	
-	this->data_->eeg    = nullptr;
-	this->data_->exg    = nullptr;
-	this->data_->tri    = nullptr;
-	this->data_->sframe = 0;
-	
-
-	delete this->data_;
-}
-
-void EGDDevice::destroy_egd_labels(void) {
-
-	// destroy eeg labels
-	for (auto i=0; i<this->grp_[0].nch; i++) 
-		free(this->data_->leeg[i]);
-	free(this->data_->leeg);
-	this->data_->leeg = nullptr;
-	
-	// destroy exg labels
-	for (auto i=0; i<this->grp_[1].nch; i++) 
-		free(this->data_->lexg[i]);
-	free(this->data_->lexg);
-	this->data_->lexg = nullptr;
-}
-
-void EGDDevice::destroy_egd_cababilities(void) {
-	if(this->egdcap_ != nullptr)
-		delete egdcap_;
-}
-
-
-void EGDDevice::destroy_egd_strides(void) {
-	if(this->strides_ != nullptr)
-		free(this->strides_);
-	this->strides_ = nullptr;
-}
-
-
-void EGDDevice::destroy_egd_groups(void) {
-	if(this->grp_ != nullptr)
-		free(this->grp_);
-	this->grp_ = nullptr;
-}
 
 
 bool EGDDevice::setup_egd_capabilities(void) {
@@ -297,9 +263,9 @@ bool EGDDevice::setup_egd_capabilities(void) {
 	this->egdcap_->id			 = std::string(id);
 	this->egdcap_->prefiltering  = std::string(prefiltering);
 
-	this->data_->neeg = neeg;
-	this->data_->nexg = nexg;
-	this->data_->ntri = ntri;
+	this->data_.neeg = neeg;
+	this->data_.nexg = nexg;
+	this->data_.ntri = ntri;
 
 	return true;
 }
@@ -332,13 +298,13 @@ bool EGDDevice::setup_egd_data(void) {
 	}
 	
 	// Compute sizes so not to call malloc if size == 0
-	this->data_->seeg = this->strides_[0]*this->data_->sframe;
-	this->data_->sexg = this->strides_[1]*this->data_->sframe;
-	this->data_->stri = this->strides_[2]*this->data_->sframe;
+	this->data_.seeg = this->strides_[0]*this->data_.sframe;
+	this->data_.sexg = this->strides_[1]*this->data_.sframe;
+	this->data_.stri = this->strides_[2]*this->data_.sframe;
 
-	this->data_->eeg = this->data_->seeg ? (void*)malloc(this->data_->seeg) : nullptr;
-	this->data_->exg = this->data_->sexg ? (void*)malloc(this->data_->sexg) : nullptr;
-	this->data_->tri = this->data_->stri ? (void*)malloc(this->data_->stri) : nullptr;
+	this->data_.eeg = this->data_.seeg ? (void*)malloc(this->data_.seeg) : nullptr;
+	this->data_.exg = this->data_.sexg ? (void*)malloc(this->data_.sexg) : nullptr;
+	this->data_.tri = this->data_.stri ? (void*)malloc(this->data_.stri) : nullptr;
 
 	return true;
 }
@@ -360,21 +326,21 @@ bool EGDDevice::setup_egd_groups(void) {
 	this->grp_[0].iarray	 = 0;
 	this->grp_[0].datatype	 = EGD_FLOAT;
 	this->grp_[0].arr_offset = 0;
-	this->grp_[0].nch		 = this->data_->neeg;
+	this->grp_[0].nch		 = this->data_.neeg;
 	
 	this->grp_[1].sensortype = EGD_SENSOR;
 	this->grp_[1].index		 = 0; 
 	this->grp_[1].iarray	 = 1; 
 	this->grp_[1].datatype	 = EGD_FLOAT;
 	this->grp_[1].arr_offset = 0;
-	this->grp_[1].nch	     = this->data_->nexg;
+	this->grp_[1].nch	     = this->data_.nexg;
 	
 	this->grp_[2].sensortype = EGD_TRIGGER;
 	this->grp_[2].index		 = 0; 
 	this->grp_[2].iarray	 = 2;
 	this->grp_[2].datatype	 = EGD_INT32;
 	this->grp_[2].arr_offset = 0;
-	this->grp_[2].nch		 = this->data_->ntri;
+	this->grp_[2].nch		 = this->data_.ntri;
 
 	return true;
 }
@@ -384,7 +350,7 @@ bool EGDDevice::setup_egd_frame(float hz) {
 		std::cerr<<"[Error] - Capabilities are not allocated"<<std::endl;
 		return false;
 	}
-	this->data_->sframe = (size_t)((float)this->egdcap_->sampling_rate/hz);
+	this->data_.sframe = (size_t)((float)this->egdcap_->sampling_rate/hz);
 	return true;
 }
 
@@ -398,27 +364,87 @@ bool EGDDevice::setup_egd_labels(void) {
 	}
 	
 	// Allocate and copy labels for eeg
-	this->data_->leeg = (char**)malloc(this->grp_[0].nch * sizeof(char*));
-	memset(this->data_->leeg, 0, this->grp_[0].nch * sizeof(char*));
+	this->data_.leeg = (char**)malloc(this->grp_[0].nch * sizeof(char*));
+	memset(this->data_.leeg, 0, this->grp_[0].nch * sizeof(char*));
 	type = this->grp_[0].sensortype;
 	for (auto i=0; i<this->grp_[0].nch; i++) {
-		this->data_->leeg[i] = (char*)malloc(EGD_MAXSIZE_CHANNEL_NAME*sizeof(char));
-		memset(this->data_->leeg[i], 0, EGD_MAXSIZE_CHANNEL_NAME *sizeof(char));
-		egd_channel_info(this->egddev_, type, i, EGD_LABEL, this->data_->leeg[i], EGD_EOL);
+		this->data_.leeg[i] = (char*)malloc(EGD_MAXSIZE_CHANNEL_NAME*sizeof(char));
+		memset(this->data_.leeg[i], 0, EGD_MAXSIZE_CHANNEL_NAME *sizeof(char));
+		egd_channel_info(this->egddev_, type, i, EGD_LABEL, this->data_.leeg[i], EGD_EOL);
 	}
 	
 	// Allocate and copy labels for exg
-	this->data_->lexg = (char**)malloc(this->grp_[1].nch * sizeof(char*));
-	memset(this->data_->lexg, 0, this->grp_[1].nch * sizeof(char*));
+	this->data_.lexg = (char**)malloc(this->grp_[1].nch * sizeof(char*));
+	memset(this->data_.lexg, 0, this->grp_[1].nch * sizeof(char*));
 	type = this->grp_[1].sensortype;
 	for (auto i=0; i<this->grp_[1].nch; i++) {
-		this->data_->lexg[i] = (char*)malloc(EGD_MAXSIZE_CHANNEL_NAME*sizeof(char));
-		memset(this->data_->lexg[i], 0, EGD_MAXSIZE_CHANNEL_NAME *sizeof(char));
-		egd_channel_info(this->egddev_, type, i, EGD_LABEL, this->data_->lexg[i], EGD_EOL);
+		this->data_.lexg[i] = (char*)malloc(EGD_MAXSIZE_CHANNEL_NAME*sizeof(char));
+		memset(this->data_.lexg[i], 0, EGD_MAXSIZE_CHANNEL_NAME *sizeof(char));
+		egd_channel_info(this->egddev_, type, i, EGD_LABEL, this->data_.lexg[i], EGD_EOL);
 	}
 
 	return true;
 }
+
+void EGDDevice::destroy_egd_data(void) {
+	if(this->data_.eeg != nullptr)
+		free(this->data_.eeg);
+	if(this->data_.exg != nullptr)
+		free(this->data_.exg);
+	if(this->data_.tri != nullptr)
+		free(this->data_.tri);
+
+	if(this->grp_ != nullptr)
+		this->destroy_egd_labels();
+	
+	this->data_.eeg    = nullptr;
+	this->data_.exg    = nullptr;
+	this->data_.tri    = nullptr;
+	this->data_.sframe = 0;
+	
+}
+void EGDDevice::destroy_egd_labels(void) {
+
+
+
+	// destroy eeg labels
+	if(this->data_.leeg != nullptr) {
+		for (auto i=0; i<this->grp_[0].nch; i++) 
+			free(this->data_.leeg[i]);
+		free(this->data_.leeg);
+		this->data_.leeg = nullptr;
+	}
+	
+	// destroy exg labels
+	if(this->data_.lexg != nullptr) {
+		for (auto i=0; i<this->grp_[1].nch; i++) 
+			free(this->data_.lexg[i]);
+		free(this->data_.lexg);
+		this->data_.lexg = nullptr;
+	}
+}
+
+void EGDDevice::destroy_egd_cababilities(void) {
+	if(this->egdcap_ != nullptr)
+		delete egdcap_;
+	this->egdcap_ = nullptr;
+}
+
+
+void EGDDevice::destroy_egd_strides(void) {
+	if(this->strides_ != nullptr)
+		free(this->strides_);
+	this->strides_ = nullptr;
+}
+
+
+void EGDDevice::destroy_egd_groups(void) {
+	if(this->grp_ != nullptr)
+		free(this->grp_);
+	this->grp_ = nullptr;
+}
+
+
 
 
 size_t EGDDevice::get_egd_size(int egdtype) {

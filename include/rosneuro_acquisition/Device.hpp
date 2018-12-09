@@ -49,7 +49,7 @@ class Device {
 		std::string		model_;
 		std::string		id_;
 		unsigned int	sampling_rate_;
-		DeviceData*		data_;
+		DeviceData		data_;
 
 };
 

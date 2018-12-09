@@ -22,5 +22,7 @@ int main(int argc, char** argv) {
 
 	egddev.Dump();
 
+	egddev.Close();
+
 	return 0;
 }
