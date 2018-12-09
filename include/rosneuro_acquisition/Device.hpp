@@ -18,7 +18,6 @@ struct DeviceData {
 	void* 			tri;
 	char**			leeg;
 	char**			lexg;
-	char**			ltri;
 
 	size_t			sframe;
 };
@@ -34,7 +33,7 @@ class Device {
 		virtual bool   Close(void) = 0;
 		virtual bool   Start(void) = 0;
 		virtual bool   Stop(void) = 0;
-		virtual size_t GetData(void) = 0;
+		virtual size_t GetData(DeviceData* data) = 0;
 		virtual size_t GetAvailable(void) = 0;
 
 		virtual std::string GetModel(void);

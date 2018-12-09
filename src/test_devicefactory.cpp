@@ -1,4 +1,5 @@
 #include "rosneuro_acquisition/DeviceFactory.hpp"
+#include <unistd.h>
 
 using namespace rosneuro::acquisition;
 
@@ -9,13 +10,37 @@ int main(int argc, char** argv) {
 
 	std::unique_ptr<Device> egddev   = factory.createDevice(DeviceType::EGDDEV);
 	std::unique_ptr<Device> dummydev = factory.createDevice(DeviceType::DUMMYDEV);
-	std::unique_ptr<Device> xxxdev   = factory.createDevice(666);
 	
-
 	egddev->Who();
 	dummydev->Who();
 
-	egddev->Open("gtec");
+	std::cout<<">>>>>>>>> TEST EGDDEV <<<<<<<<<<<<<<<"<<std::endl;
+	if(egddev->Open(argv[1]) == false)
+		return -1;
+		
+	sleep(1);
+	
+	if(egddev->Setup(16.0f) == false) {
+		std::cerr<<"SETUP ERROR"<<std::endl;
+		return -1;
+	}
+
+
+	egddev->Dump();
+	
+	std::cout<<">>>>>>>>> TEST DUMMYDEV <<<<<<<<<<<<<<<"<<std::endl;
+	if(dummydev->Open("") == false)
+		return -1;
+		
+	sleep(1);
+	
+	if(dummydev->Setup(16.0f) == false) {
+		std::cerr<<"SETUP ERROR"<<std::endl;
+		return -1;
+	}
+
+
+	dummydev->Dump();
 
 	return 0;
 }

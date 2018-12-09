@@ -9,7 +9,6 @@ int main(int argc, char** argv) {
 	rosneuro::acquisition::EGDDevice egddev;
 
 
-	//if(egddev.Open("gtec") == false)
 	if(egddev.Open(argv[1]) == false)
 		return -1;
 		

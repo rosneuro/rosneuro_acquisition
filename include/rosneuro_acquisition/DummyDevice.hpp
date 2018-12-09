@@ -22,8 +22,9 @@ class DummyDevice : public Device {
 		bool Close(void);
 		bool Start(void);
 		bool Stop(void);
-		size_t GetData(void);
+		size_t GetData(DeviceData* data);
 		size_t GetAvailable(void);
+		void Dump(void);
 };
 
 	}

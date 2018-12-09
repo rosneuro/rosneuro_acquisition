@@ -35,11 +35,10 @@ class EGDDevice : public Device {
 		bool Close(void);
 		bool Start(void);
 		bool Stop(void);
-		size_t GetData(void);
+		size_t GetData(DeviceData* data);
 		size_t GetAvailable(void);
 
 		const std::string GetPrefiltering(void);
-		const char*** GetLabels(void);
 		
 		void Dump(void);
 			
@@ -47,7 +46,6 @@ class EGDDevice : public Device {
 		void init_egd_capabilities(void);
 		void init_egd_groups(void);
 		void init_egd_strides(void);
-		void init_egd_labels(void);
 		void init_egd_data(void);
 
 		bool setup_egd_capabilities(void);
@@ -58,9 +56,9 @@ class EGDDevice : public Device {
 		bool setup_egd_frame(float hz);
 
 		void destroy_egd_data(void);
+		void destroy_egd_labels(void);
 		void destroy_egd_cababilities(void);
 		void destroy_egd_strides(void);
-		void destroy_egd_labels(void);
 		void destroy_egd_groups(void);
 
 		size_t get_egd_size(int egdtype);
@@ -69,11 +67,6 @@ class EGDDevice : public Device {
 		struct  eegdev*	egddev_;
 		struct	grpconf* grp_;
 		size_t*	strides_;
-		char***	labels_;
-		void*	eeg_;
-		void*	exg_;
-		void*	tri_;
-		size_t	frames_;
 		unsigned int ngrp_;
 		EGDCapabilities* egdcap_;
 };
