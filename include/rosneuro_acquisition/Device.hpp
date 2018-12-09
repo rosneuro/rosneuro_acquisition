@@ -6,6 +6,23 @@
 namespace rosneuro {
 	namespace acquisition {
 
+struct DeviceData {
+	unsigned int	neeg;
+	unsigned int 	nexg;
+	unsigned int 	ntri;
+	size_t			seeg;
+	size_t			sexg;
+	size_t			stri;
+	void*			eeg;
+	void* 			exg;
+	void* 			tri;
+	char**			leeg;
+	char**			lexg;
+	char**			ltri;
+
+	size_t			sframe;
+};
+
 class Device {
 	
 	public:
@@ -34,6 +51,7 @@ class Device {
 		std::string		model_;
 		std::string		id_;
 		unsigned int	sampling_rate_;
+		DeviceData*		data_;
 
 };
 

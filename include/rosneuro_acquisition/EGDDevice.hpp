@@ -9,6 +9,7 @@
 #include "rosneuro_acquisition/Device.hpp"
 
 #define EGD_DEFAULT_GROUP_NUMBER 3
+#define EGD_MAXSIZE_CHANNEL_NAME 32
 
 namespace rosneuro {
 	namespace acquisition {
@@ -42,30 +43,27 @@ class EGDDevice : public Device {
 		
 		void Dump(void);
 			
-	protected:
-		virtual void init_egd_capabilities(void);
-		virtual void init_egd_groups(void);
-		virtual void init_egd_strides(void);
-		virtual void init_egd_labels(void);
-		virtual void init_egd_data(void);
+	private:
+		void init_egd_capabilities(void);
+		void init_egd_groups(void);
+		void init_egd_strides(void);
+		void init_egd_labels(void);
+		void init_egd_data(void);
 
-		virtual bool setup_egd_capabilities(void) {};
-		virtual bool setup_egd_groups(void) {};
-		virtual bool setup_egd_strides(void) {};
-		virtual bool setup_egd_data(void) {};
-		virtual bool setup_egd_labels(void) {};
+		bool setup_egd_capabilities(void);
+		bool setup_egd_groups(void);
+		bool setup_egd_strides(void);
+		bool setup_egd_data(void);
+		bool setup_egd_labels(void);
+		bool setup_egd_frame(float hz);
 
-		virtual void destroy_egd_data(void);
-		virtual void destroy_egd_cababilities(void);
-		virtual void destroy_egd_strides(void);
-		virtual void destroy_egd_labels(void);
-		virtual void destroy_egd_groups(void);
+		void destroy_egd_data(void);
+		void destroy_egd_cababilities(void);
+		void destroy_egd_strides(void);
+		void destroy_egd_labels(void);
+		void destroy_egd_groups(void);
 
-		bool InitCapabilities(void);
-		void InitGroups(void);
-		void InitBuffers(void);
-		void InitFrame(float hz);
-		size_t SizeEGD(int egdtype);
+		size_t get_egd_size(int egdtype);
 
 	protected:
 		struct  eegdev*	egddev_;

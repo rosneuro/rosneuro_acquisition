@@ -16,6 +16,7 @@ int main(int argc, char** argv) {
 	sleep(1);
 	
 	if(egddev.Setup(16.0f) == false) {
+		std::cerr<<"SETUP ERROR"<<std::endl;
 		return -1;
 	}
 
