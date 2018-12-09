@@ -34,14 +34,27 @@ add_library(rosneuro_acquisition
 			src/EGDDevice.cpp
 			src/DummyDevice.cpp
 			src/DeviceFactory.cpp
+			src/Acquisition.cpp
 			)
 add_dependencies(rosneuro_acquisition rosneuro_acquisition_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rosneuro_acquisition ${catkin_LIBRARIES} ${EEGDEV_LIBRARIES})
+
+add_executable(acquisition src/acquisition.cpp)
+target_link_libraries(acquisition rosneuro_acquisition)
 
 add_executable(test_devicefactory src/test_devicefactory.cpp)
 target_link_libraries(test_devicefactory rosneuro_acquisition)
 
 add_executable(test_egddevice src/test_egddevice.cpp)
 target_link_libraries(test_egddevice rosneuro_acquisition)
+
+add_executable(test_rule1 src/test_rule1.cpp)
+target_link_libraries(test_rule1 rosneuro_acquisition)
+
+add_executable(test_rule2 src/test_rule2.cpp)
+target_link_libraries(test_rule2 rosneuro_acquisition)
+
+add_executable(test_rule3 src/test_rule3.cpp)
+target_link_libraries(test_rule3 rosneuro_acquisition)
 
 
