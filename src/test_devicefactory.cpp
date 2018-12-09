@@ -1,7 +1,7 @@
 #include "rosneuro_acquisition/DeviceFactory.hpp"
 #include <unistd.h>
 
-using namespace rosneuro::acquisition;
+using namespace rosneuro;
 
 int main(int argc, char** argv) {
 

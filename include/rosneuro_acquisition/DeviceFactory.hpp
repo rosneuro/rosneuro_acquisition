@@ -7,7 +7,6 @@
 #include "rosneuro_acquisition/DummyDevice.hpp"
 
 namespace rosneuro {
-	namespace acquisition {
 
 enum DeviceType {EGDDEV, DUMMYDEV};
 
@@ -18,7 +17,6 @@ class DeviceFactory {
 
 };
 
-	}
 }
 
 

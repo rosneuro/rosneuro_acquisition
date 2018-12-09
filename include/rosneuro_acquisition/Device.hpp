@@ -4,7 +4,6 @@
 #include <string>
 
 namespace rosneuro {
-	namespace acquisition {
 
 struct DeviceData {
 	unsigned int	neeg;
@@ -55,7 +54,6 @@ class Device {
 };
 
 
-	}
 }
 
 

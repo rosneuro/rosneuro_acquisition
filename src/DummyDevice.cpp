@@ -4,7 +4,6 @@
 #include "rosneuro_acquisition/DummyDevice.hpp"
 
 namespace rosneuro {
-	namespace acquisition {
 
 DummyDevice::DummyDevice(void) {
 	this->name_ = "dummy";
@@ -61,7 +60,6 @@ void DummyDevice::Dump(void) {
 }
 
 
-	}
 }
 
 #endif

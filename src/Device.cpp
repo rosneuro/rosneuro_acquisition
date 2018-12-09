@@ -4,7 +4,6 @@
 #include "rosneuro_acquisition/Device.hpp"
 
 namespace rosneuro {
-	namespace acquisition {
 
 Device::Device(void) {
 	this->name_  = "undefined";
@@ -36,7 +35,6 @@ void Device::Who(void) {
 }
 
 
-	}
 }
 
 #endif

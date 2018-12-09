@@ -12,7 +12,6 @@
 #define EGD_MAXSIZE_CHANNEL_NAME 32
 
 namespace rosneuro {
-	namespace acquisition {
 
 struct EGDCapabilities {
 	std::string  model;
@@ -71,7 +70,6 @@ class EGDDevice : public Device {
 		EGDCapabilities* egdcap_;
 };
 
-	}
 }
 
 

@@ -9,7 +9,6 @@
 // Dummy device to test the device factory
 
 namespace rosneuro {
-	namespace acquisition {
 
 class DummyDevice : public Device {
 
@@ -27,7 +26,6 @@ class DummyDevice : public Device {
 		void Dump(void);
 };
 
-	}
 }
 
 

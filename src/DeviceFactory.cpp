@@ -4,7 +4,6 @@
 #include "rosneuro_acquisition/DeviceFactory.hpp"
 
 namespace rosneuro {
-	namespace acquisition {
 
 std::unique_ptr<Device> DeviceFactory::createDevice(unsigned int type) {
 
@@ -26,7 +25,6 @@ std::unique_ptr<Device> DeviceFactory::createDevice(unsigned int type) {
 }
 
 
-	}
 }
 
 #endif

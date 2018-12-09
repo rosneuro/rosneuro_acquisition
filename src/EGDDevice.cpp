@@ -4,7 +4,6 @@
 #include "rosneuro_acquisition/EGDDevice.hpp"
 
 namespace rosneuro {
-	namespace acquisition {
 
 EGDDevice::EGDDevice(void) {
 	
@@ -443,7 +442,6 @@ size_t EGDDevice::get_egd_size(int egdtype) {
 }
 
 
-	}
 }
 
 #endif

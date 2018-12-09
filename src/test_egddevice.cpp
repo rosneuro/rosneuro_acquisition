@@ -6,7 +6,7 @@ int main(int argc, char** argv) {
 
 
 
-	rosneuro::acquisition::EGDDevice egddev;
+	rosneuro::EGDDevice egddev;
 
 
 	if(egddev.Open(argv[1]) == false)
