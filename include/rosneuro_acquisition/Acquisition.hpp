@@ -3,6 +3,7 @@
 
 #include <ros/ros.h>
 #include "rosneuro_acquisition/DeviceFactory.hpp"
+#include "rosneuro_acquisition_msgs/Acquisition.h"
 
 
 namespace rosneuro {
