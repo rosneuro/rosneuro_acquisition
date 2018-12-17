@@ -12,7 +12,7 @@ bool AcquisitionTools::ToMessage(const DeviceData* data, rosneuro_msgs::NeuroDat
 
 	float* eeg = (float*)data->eeg;
 	float* exg = (float*)data->exg;
-	float* tri = (float*)data->tri;
+	int32_t* tri = (int32_t*)data->tri;
 	
 	msg.eeg.data.assign(&(eeg[0]), &(eeg[msg.info.neeg*msg.info.nsamples]));
 	msg.exg.data.assign(&(exg[0]), &(exg[msg.info.nexg*msg.info.nsamples]));

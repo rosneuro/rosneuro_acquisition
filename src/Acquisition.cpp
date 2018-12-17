@@ -8,6 +8,7 @@ namespace rosneuro {
 Acquisition::Acquisition(void) : p_nh_("~") {
 	this->data_		= nullptr;
 	this->topic_	= "/neurodata"; 
+	this->run_      = false;
 }
 
 Acquisition::~Acquisition(void) {}
@@ -26,7 +27,7 @@ bool Acquisition::configure(void) {
 	
 	ros::param::param("~fs", this->fs_, 16.0f);
 	ros::param::param("~reopen", this->reopen_, true);
-	ros::param::param("~autostart", this->run_, true);
+	ros::param::param("~autostart", this->autostart_, true);
 
 	this->pub_ = this->nh_.advertise<rosneuro_msgs::NeuroData>(this->topic_, 1);
 	this->srv_start_ = this->p_nh_.advertiseService("start", &Acquisition::on_acquisition_start, this);
@@ -75,19 +76,17 @@ bool Acquisition::Run(void) {
 	// Debug - Dump device configuration
 	this->dev_->Dump();
 
-	// Waiting for starting
-	while(this->nh_.ok() && (this->IsRunning() == false)) {
-		ROS_WARN_ONCE("Device idle. Waiting for start");
-		ros::spinOnce();
-		r.sleep();
+	// Waiting for starting OR start
+	if(this->autostart_ == false) {
+		while(this->nh_.ok() && (this->IsRunning() == false)) {
+			ROS_WARN_ONCE("Device idle. Waiting for start");
+			ros::spinOnce();
+			r.sleep();
+		}
+	} else {
+		if(this->Start() == false)
+			return false;
 	}
-
-	// Start the device
-	if(this->Start() == false) {
-		ROS_ERROR("Cannot start the device");
-		return false;
-	}
-	ROS_INFO("Device started");
 	
 	DeviceData* tdata;
 	
@@ -118,11 +117,9 @@ bool Acquisition::Run(void) {
 					return false;
 				}
 				ROS_INFO("Device correctly re-configured");
-				if(this->Start() == false) {
-					ROS_ERROR("Cannot re-start the device");
+				
+				if(this->Start() == false)
 					return false;
-				}
-				ROS_INFO("Device re-started");
 			}
 			continue;
 		}
@@ -148,9 +145,8 @@ bool Acquisition::IsRunning(void) {
 bool Acquisition::on_acquisition_start(std_srvs::Empty::Request& req,
 									   std_srvs::Empty::Response& res) {
 
-	ROS_WARN("Requested acquisition to start");
-	if(this->Start() == true)
-		ROS_WARN("Acquisition started");
+	ROS_INFO("Requested acquisition to start");
+	this->Start();
 
 	return true;
 }
@@ -158,31 +154,54 @@ bool Acquisition::on_acquisition_start(std_srvs::Empty::Request& req,
 bool Acquisition::on_acquisition_stop(std_srvs::Empty::Request& req,
 									  std_srvs::Empty::Response& res) {
 
-	ROS_WARN("Requested acquisition to stop");
-	if(this->Stop() == true)
-		ROS_WARN("Acquisition stopped");
+	ROS_INFO("Requested acquisition to stop");
+	this->Stop();
 
 	return true;
 }
 
 bool Acquisition::Start(void) {
-	
-	if(this->IsRunning() == true)
+
+	bool retcod;
+
+	if(this->IsRunning() == true) {
+		ROS_INFO("Device '%s' is already started", this->dev_->GetName().c_str());
 		return true;
+	}
 
-	this->run_ = this->dev_->Start();
+	if(this->dev_->Start() == true) {
+		ROS_INFO("Device '%s' started", this->dev_->GetName().c_str());
+		this->run_ = true;
+		retcod = true;
+	} else {
+		ROS_ERROR("Cannot start the device '%s'", this->dev_->GetName().c_str());
+		this->run_ = false;
+		retcod = false;
+	}
 
-	return this->run_;
+	return retcod;
 }
 
 bool Acquisition::Stop(void) {
 	
-	if(this->IsRunning() == false)
+	bool retcod;
+	
+	if(this->IsRunning() == false) {
+		ROS_INFO("Device '%s' is already stopped", this->dev_->GetName().c_str());
 		return true;
+	}
 
-	this->run_ = !(this->dev_->Stop());
+	if(this->dev_->Stop() == true) {
+		ROS_INFO("Device '%s' stopped", this->dev_->GetName().c_str());
+		this->run_ = false;
+		retcod = true;
+	} else {
+		ROS_ERROR("Cannot stop the device '%s'", this->dev_->GetName().c_str());
+		this->run_ = true;
+		retcod = false;
+	}
 
-	return !(this->run_);
+	return retcod;
 }
 
 }

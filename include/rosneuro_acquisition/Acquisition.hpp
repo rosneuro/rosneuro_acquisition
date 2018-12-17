@@ -50,6 +50,7 @@ class Acquisition {
 		float			fs_;
 		bool			reopen_;
 		bool			run_;
+		bool			autostart_;
 		rosneuro_msgs::NeuroData msg_;
 
 
