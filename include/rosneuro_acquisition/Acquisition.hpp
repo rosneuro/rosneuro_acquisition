@@ -2,6 +2,7 @@
 #define ROSNEURO_ACQUISITION_HPP
 
 #include <ros/ros.h>
+#include <std_srvs/Empty.h>
 #include "rosneuro_acquisition/DeviceFactory.hpp"
 #include "rosneuro_msgs/NeuroData.h"
 #include "rosneuro_msgs/DeviceInfo.h"
@@ -21,11 +22,25 @@ class Acquisition {
 
 		bool Run(void);
 
+		bool IsRunning(void);
+
+		bool Start(void);
+		bool Stop(void);
+
 	private:
-		ros::NodeHandle	nh_;
-		ros::NodeHandle	p_nh_;
-		ros::Publisher	pub_;
-		std::string		topic_;
+		bool on_acquisition_start(std_srvs::Empty::Request& req,
+								  std_srvs::Empty::Response& res);
+		bool on_acquisition_stop(std_srvs::Empty::Request& req,
+								 std_srvs::Empty::Response& res);
+
+	private:
+		ros::NodeHandle		nh_;
+		ros::NodeHandle		p_nh_;
+		ros::Publisher		pub_;
+		ros::ServiceServer	srv_start_;
+		ros::ServiceServer	srv_stop_;
+		std::string			topic_;
+
 
 		DeviceData* 	data_;
 		DeviceFactory	factory_;
@@ -34,6 +49,7 @@ class Acquisition {
 		std::string		devname_;
 		float			fs_;
 		bool			reopen_;
+		bool			run_;
 		rosneuro_msgs::NeuroData msg_;
 
 

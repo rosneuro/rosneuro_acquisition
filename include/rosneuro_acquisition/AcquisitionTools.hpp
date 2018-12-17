@@ -12,7 +12,8 @@ class AcquisitionTools {
 
 	public:
 		static bool ToMessage(const DeviceData* data, rosneuro_msgs::NeuroData& msg);
-		static void ClearMessage(rosneuro_msgs::NeuroData& msg);
+		static bool SetMessage(const DeviceCapabilities* cap, rosneuro_msgs::NeuroData& msg);
+		static void ClearDataMessage(rosneuro_msgs::NeuroData& msg);
 		static void ClearInfoMessage(rosneuro_msgs::DeviceInfo& info);
 
 	private:

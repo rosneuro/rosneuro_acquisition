@@ -7,88 +7,84 @@ namespace rosneuro {
 
 bool AcquisitionTools::ToMessage(const DeviceData* data, rosneuro_msgs::NeuroData& msg) {
 
-	/*
 	// Clearing the message before filling it
-	AcquisitionTools::ClearMessage(msg);
-
-	msg.nsamples	  = data->sframe;
-	msg.eeg_nchannels = data->neeg;
-	msg.exg_nchannels = data->nexg;
-	msg.tri_nchannels = data->ntri;
-	msg.eeg_labels.assign(&(data->leeg[0]), &(data->leeg[data->neeg]));
-	msg.exg_labels.assign(&(data->lexg[0]), &(data->lexg[data->nexg]));
+	AcquisitionTools::ClearDataMessage(msg);
 
 	float* eeg = (float*)data->eeg;
 	float* exg = (float*)data->exg;
 	float* tri = (float*)data->tri;
 	
-	msg.eeg_data.layout.dim.push_back(std_msgs::MultiArrayDimension());
-	msg.eeg_data.layout.dim.push_back(std_msgs::MultiArrayDimension());
-	msg.eeg_data.layout.dim[0].label	= "channel";
-	msg.eeg_data.layout.dim[0].size		= data->neeg;
-	msg.eeg_data.layout.dim[0].stride	= data->neeg*data->sframe;
-	msg.eeg_data.layout.dim[1].label	= "sample";
-	msg.eeg_data.layout.dim[1].size		= data->sframe;
-	msg.eeg_data.layout.dim[1].stride	= data->sframe;
-	msg.eeg_data.data.assign(&(eeg[0]), &(eeg[data->neeg*data->sframe]));
-	
-	msg.exg_data.layout.dim.push_back(std_msgs::MultiArrayDimension());
-	msg.exg_data.layout.dim.push_back(std_msgs::MultiArrayDimension());
-	msg.exg_data.layout.dim[0].label	= "channel";
-	msg.exg_data.layout.dim[0].size		= data->nexg;
-	msg.exg_data.layout.dim[0].stride	= data->nexg*data->sframe;
-	msg.exg_data.layout.dim[1].label	= "sample";
-	msg.exg_data.layout.dim[1].size		= data->sframe;
-	msg.exg_data.layout.dim[1].stride	= data->sframe;
-	msg.exg_data.data.assign(&(exg[0]), &(exg[data->nexg*data->sframe]));
-	
-	msg.tri_data.layout.dim.push_back(std_msgs::MultiArrayDimension());
-	msg.tri_data.layout.dim.push_back(std_msgs::MultiArrayDimension());
-	msg.tri_data.layout.dim[0].label	= "channel";
-	msg.tri_data.layout.dim[0].size		= data->ntri;
-	msg.tri_data.layout.dim[0].stride	= data->ntri*data->sframe;
-	msg.tri_data.layout.dim[1].label	= "sample";
-	msg.tri_data.layout.dim[1].size		= data->sframe;
-	msg.tri_data.layout.dim[1].stride	= data->sframe;
-	msg.tri_data.data.assign(&(tri[0]), &(tri[data->ntri*data->sframe]));
+	msg.eeg.data.assign(&(eeg[0]), &(eeg[msg.info.neeg*msg.info.nsamples]));
+	msg.exg.data.assign(&(exg[0]), &(exg[msg.info.nexg*msg.info.nsamples]));
+	msg.tri.data.assign(&(tri[0]), &(tri[msg.info.ntri*msg.info.nsamples]));
 
-	for(auto i = msg.eeg_labels.begin(); i<msg.eeg_labels.end(); ++i)
-		std::cout<<(*i)<<std::endl;
-	
-	for(auto i = msg.exg_labels.begin(); i<msg.exg_labels.end(); ++i)
-		std::cout<<(*i)<<std::endl;
-*/
+	msg.header.stamp = ros::Time::now();
+
 	return true;
 }
 
 
-void AcquisitionTools::ClearMessage(rosneuro_msgs::NeuroData& msg) {
-
-	/*
-	// Clearing general information
-	msg.info.sampling_rate	= 0;
-	msg.info.nsamples		= 0;
-	msg.info.neeg			= 0;
-	msg.info.nexg			= 0;
-	msg.info.ntri			= 0;
-
-	// Clearing multilayer message
-	msg.eeg_data.layout.dim.clear();
-	msg.exg_data.layout.dim.clear();
-	msg.tri_data.layout.dim.clear();
-
-	msg.eeg_data.layout.data_offset = 0;
-	msg.exg_data.layout.data_offset = 0;
-	msg.tri_data.layout.data_offset = 0;
+void AcquisitionTools::ClearDataMessage(rosneuro_msgs::NeuroData& msg) {
 	
-	msg.eeg_data.data.clear();
-	msg.exg_data.data.clear();
-	msg.tri_data.data.clear();
+	msg.eeg.data.clear();
+	msg.exg.data.clear();
+	msg.tri.data.clear();
 
-	// Clearing label vectors
-	msg.eeg_labels.clear();
-	msg.exg_labels.clear();
-	*/
+}
+
+bool AcquisitionTools::SetMessage(const DeviceCapabilities* cap, rosneuro_msgs::NeuroData& msg) {
+
+	if(cap == nullptr)
+		return false;
+
+	// Set the header
+	msg.header.frame_id		= "0";
+
+	// Set the DeviceInfo
+	msg.info.model			= cap->model;
+	msg.info.id				= cap->id;
+	msg.info.prefiltering	= cap->prefiltering;
+	msg.info.sampling_rate	= cap->sampling_rate;
+	msg.info.neeg			= cap->neeg;
+	msg.info.nexg			= cap->nexg;
+	msg.info.ntri			= cap->ntri;
+	msg.info.nsamples		= cap->nsamples;
+	msg.info.leeg			= cap->leeg;
+	msg.info.lexg			= cap->lexg;
+	msg.info.ltri			= cap->ltri;
+
+	// Set the data array
+	msg.eeg.layout.dim.push_back(std_msgs::MultiArrayDimension());
+	msg.eeg.layout.dim.push_back(std_msgs::MultiArrayDimension());
+	msg.eeg.layout.dim[0].label		= "channel";
+	msg.eeg.layout.dim[0].size		= cap->neeg;
+	msg.eeg.layout.dim[0].stride	= cap->neeg*cap->nsamples;
+	msg.eeg.layout.dim[1].label		= "sample";
+	msg.eeg.layout.dim[1].size		= cap->nsamples;
+	msg.eeg.layout.dim[1].stride	= cap->nsamples;
+	msg.eeg.layout.data_offset		= 0;
+	
+	msg.exg.layout.dim.push_back(std_msgs::MultiArrayDimension());
+	msg.exg.layout.dim.push_back(std_msgs::MultiArrayDimension());
+	msg.exg.layout.dim[0].label		= "channel";
+	msg.exg.layout.dim[0].size		= cap->nexg;
+	msg.exg.layout.dim[0].stride	= cap->nexg*cap->nsamples;
+	msg.exg.layout.dim[1].label		= "sample";
+	msg.exg.layout.dim[1].size		= cap->nsamples;
+	msg.exg.layout.dim[1].stride	= cap->nsamples;
+	msg.exg.layout.data_offset		= 0;
+	
+	msg.tri.layout.dim.push_back(std_msgs::MultiArrayDimension());
+	msg.tri.layout.dim.push_back(std_msgs::MultiArrayDimension());
+	msg.tri.layout.dim[0].label		= "channel";
+	msg.tri.layout.dim[0].size		= cap->ntri;
+	msg.tri.layout.dim[0].stride	= cap->ntri*cap->nsamples;
+	msg.tri.layout.dim[1].label		= "sample";
+	msg.tri.layout.dim[1].size		= cap->nsamples;
+	msg.tri.layout.dim[1].stride	= cap->nsamples;
+	msg.tri.layout.data_offset		= 0;
+
+	return true;
 }
 
 void AcquisitionTools::ClearInfoMessage(rosneuro_msgs::DeviceInfo& info) {
@@ -107,7 +103,6 @@ void AcquisitionTools::ClearInfoMessage(rosneuro_msgs::DeviceInfo& info) {
 	info.ltri.clear();
 }
 
-//void AcquisitionTools::InitMessage(const DeviceData
 
 
 }
