@@ -106,7 +106,7 @@ bool Acquisition::Run(void) {
 
 		// Publish DeviceData
 		this->data_ = this->dev_->GetData();
-		if(AcquisitionConverter::ToMessage(this->data_, this->msg_) == true)
+		if(AcquisitionTools::ToMessage(this->data_, this->msg_) == true)
 			this->pub_.publish(this->msg_);
 
 		if(asize > 0)

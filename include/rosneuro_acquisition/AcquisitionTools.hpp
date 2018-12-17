@@ -1,5 +1,5 @@
-#ifndef ROSNEURO_ACQUISITION_CONVERTER_HPP
-#define ROSNEURO_ACQUISITION_CONVERTER_HPP
+#ifndef ROSNEURO_ACQUISITION_TOOLS_HPP
+#define ROSNEURO_ACQUISITION_TOOLS_HPP
 
 #include <ros/ros.h>
 #include "rosneuro_acquisition/Device.hpp"
@@ -8,7 +8,7 @@
 
 namespace rosneuro {
 
-class AcquisitionConverter {
+class AcquisitionTools {
 
 	public:
 		static bool ToMessage(const DeviceData* data, rosneuro_msgs::NeuroData& msg);
@@ -16,7 +16,7 @@ class AcquisitionConverter {
 		static void ClearInfoMessage(rosneuro_msgs::DeviceInfo& info);
 
 	private:
-		AcquisitionConverter(void) {};
+		AcquisitionTools(void) {};
 
 };
 

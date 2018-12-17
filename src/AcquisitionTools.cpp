@@ -1,15 +1,15 @@
-#ifndef ROSNEURO_ACQUISITION_CONVERTER_CPP
-#define ROSNEURO_ACQUISITION_CONVERTER_CPP
+#ifndef ROSNEURO_ACQUISITION_TOOLS_CPP
+#define ROSNEURO_ACQUISITION_TOOLS_CPP
 
-#include "rosneuro_acquisition/AcquisitionConverter.hpp"
+#include "rosneuro_acquisition/AcquisitionTools.hpp"
 
 namespace rosneuro {
 
-bool AcquisitionConverter::ToMessage(const DeviceData* data, rosneuro_msgs::NeuroData& msg) {
+bool AcquisitionTools::ToMessage(const DeviceData* data, rosneuro_msgs::NeuroData& msg) {
 
 	/*
 	// Clearing the message before filling it
-	AcquisitionConverter::ClearMessage(msg);
+	AcquisitionTools::ClearMessage(msg);
 
 	msg.nsamples	  = data->sframe;
 	msg.eeg_nchannels = data->neeg;
@@ -62,7 +62,7 @@ bool AcquisitionConverter::ToMessage(const DeviceData* data, rosneuro_msgs::Neur
 }
 
 
-void AcquisitionConverter::ClearMessage(rosneuro_msgs::NeuroData& msg) {
+void AcquisitionTools::ClearMessage(rosneuro_msgs::NeuroData& msg) {
 
 	/*
 	// Clearing general information
@@ -91,7 +91,7 @@ void AcquisitionConverter::ClearMessage(rosneuro_msgs::NeuroData& msg) {
 	*/
 }
 
-void AcquisitionConverter::ClearInfoMessage(rosneuro_msgs::DeviceInfo& info) {
+void AcquisitionTools::ClearInfoMessage(rosneuro_msgs::DeviceInfo& info) {
 
 	info.sampling_rate	= 0;
 	info.nsamples		= 0;
@@ -107,7 +107,7 @@ void AcquisitionConverter::ClearInfoMessage(rosneuro_msgs::DeviceInfo& info) {
 	info.ltri.clear();
 }
 
-//void AcquisitionConverter::InitMessage(const DeviceData
+//void AcquisitionTools::InitMessage(const DeviceData
 
 
 }
