@@ -6,6 +6,8 @@
 namespace rosneuro {
 
 Acquisition::Acquisition(void) : p_nh_("~") {
+	this->data_		= nullptr;
+	this->topic_	= "/neurodata"; 
 }
 
 Acquisition::~Acquisition(void) {}
@@ -24,6 +26,8 @@ bool Acquisition::configure(void) {
 	
 	ros::param::param("~fs", this->fs_, 16.0f);
 	ros::param::param("~reopen", this->reopen_, true);
+
+	this->pub_ = this->nh_.advertise<rosneuro_acquisition_msgs::Acquisition>(this->topic_, 1);
 
 	return true;
 }
@@ -65,10 +69,12 @@ bool Acquisition::Run(void) {
 	}
 	ROS_INFO("Device started");
 	
+	DeviceData* tdata;
+	
 	ros::Rate r(60);
 	while(this->nh_.ok()) {
 
-		gsize = this->dev_->GetData(this->data_);
+		gsize = this->dev_->Get();
 		asize = this->dev_->GetAvailable();
 		if(gsize == (size_t)-1) {
 			ROS_WARN("The device is down");
@@ -99,7 +105,9 @@ bool Acquisition::Run(void) {
 
 
 		// Publish DeviceData
-		
+		this->data_ = this->dev_->GetData();
+		if(AcquisitionConverter::ToMessage(this->data_, this->msg_) == true)
+			this->pub_.publish(this->msg_);
 
 		if(asize > 0)
 			ROS_WARN("Running late: Get/Available=%zd/%zd", gsize, asize);

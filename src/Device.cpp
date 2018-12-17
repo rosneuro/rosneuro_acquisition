@@ -34,6 +34,10 @@ void Device::Who(void) {
 	printf("[%s] - %s device\n", this->GetName().c_str(), this->GetName().c_str());
 }
 
+DeviceData* Device::GetData(void) {
+	return &(this->data_);
+}
+
 
 }
 

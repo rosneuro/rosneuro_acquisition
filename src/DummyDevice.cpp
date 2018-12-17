@@ -36,8 +36,8 @@ bool DummyDevice::Stop(void) {
 	return true;
 }
 
-size_t DummyDevice::GetData(DeviceData* data) {
-	printf("[%s] - Get data\n", this->GetName().c_str());
+size_t DummyDevice::Get(void) {
+	printf("[%s] - Get\n", this->GetName().c_str());
 	return 1;
 }
 

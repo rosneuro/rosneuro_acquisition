@@ -10,7 +10,7 @@ namespace rosneuro {
 class AcquisitionConverter {
 
 	public:
-		static bool ToMessage(const DeviceData& data, rosneuro_acquisition_msgs::Acquisition& msg);
+		static bool ToMessage(const DeviceData* data, rosneuro_acquisition_msgs::Acquisition& msg);
 		static bool FromMessage(const rosneuro_acquisition_msgs::Acquisition& msg, DeviceData& data);
 		static void ClearMessage(rosneuro_acquisition_msgs::Acquisition& msg);
 

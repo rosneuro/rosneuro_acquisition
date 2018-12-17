@@ -4,6 +4,8 @@
 #include <ros/ros.h>
 #include "rosneuro_acquisition/DeviceFactory.hpp"
 #include "rosneuro_acquisition_msgs/Acquisition.h"
+#include "rosneuro_acquisition/AcquisitionConverter.hpp"
+
 
 
 namespace rosneuro {
@@ -21,6 +23,9 @@ class Acquisition {
 	private:
 		ros::NodeHandle	nh_;
 		ros::NodeHandle	p_nh_;
+		ros::Publisher	pub_;
+		std::string		topic_;
+
 		DeviceData* 	data_;
 		DeviceFactory	factory_;
 		std::unique_ptr<Device>	dev_;
@@ -28,6 +33,7 @@ class Acquisition {
 		std::string		devname_;
 		float			fs_;
 		bool			reopen_;
+		rosneuro_acquisition_msgs::Acquisition msg_;
 
 
 

@@ -32,9 +32,10 @@ class Device {
 		virtual bool   Close(void) = 0;
 		virtual bool   Start(void) = 0;
 		virtual bool   Stop(void) = 0;
-		virtual size_t GetData(DeviceData* data) = 0;
+		virtual size_t Get(void) = 0;
 		virtual size_t GetAvailable(void) = 0;
 
+		virtual DeviceData* GetData(void);
 		virtual std::string GetModel(void);
 		virtual std::string GetId(void);
 		virtual unsigned int GetSamplingRate(void);

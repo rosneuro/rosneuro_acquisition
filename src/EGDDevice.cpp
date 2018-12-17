@@ -125,17 +125,14 @@ bool EGDDevice::Stop(void) {
 	return true;
 }
 
-size_t EGDDevice::GetData(DeviceData* data) {
+size_t EGDDevice::Get(void) {
 	size_t size;
 	size = egd_get_data(this->egddev_, this->data_.sframe, 
 						this->data_.eeg, this->data_.exg, this->data_.tri);
 	if (size == -1) {
 		std::cerr<<"Error reading data: " << std::strerror(errno) << std::endl;
-		data = nullptr;
-	} else {
-		data = &(this->data_);
 	}
-
+	
 	return size;
 }
 		
@@ -252,10 +249,10 @@ bool EGDDevice::setup_egd_capabilities(void) {
 	}
 
 	// Getting prefiltering
-	if( egd_channel_info(this->egddev_, EGD_EEG, 0, EGD_PREFILTERING, &prefiltering, EGD_EOL) == -1) {
-		std::cerr<<"[Error] - Cannot get prefiltering: "<<strerror(errno)<<std::endl;
-		return false;
-	}
+	//if( egd_channel_info(this->egddev_, EGD_EEG, 0, EGD_PREFILTERING, &prefiltering, EGD_EOL) == -1) {
+	//	std::cerr<<"[Error] - Cannot get prefiltering: "<<strerror(errno)<<std::endl;
+	//	return false;
+	//}
 
 	// Populating device capabilities and data structure
 	this->egdcap_->sampling_rate = fs;
