@@ -13,15 +13,6 @@
 
 namespace rosneuro {
 
-struct EGDCapabilities {
-	std::string  model;
-	std::string  id;
-	unsigned int sampling_rate;
-	unsigned int eeg_nmax;
-    unsigned int sensor_nmax;
-    unsigned int trigger_nmax;
-	std::string	 prefiltering;
-};
 
 class EGDDevice : public Device {
 
@@ -37,7 +28,6 @@ class EGDDevice : public Device {
 		size_t Get(void);
 		size_t GetAvailable(void);
 
-		const std::string GetPrefiltering(void);
 		
 		void Dump(void);
 			
@@ -56,7 +46,6 @@ class EGDDevice : public Device {
 
 		void destroy_egd_data(void);
 		void destroy_egd_labels(void);
-		void destroy_egd_cababilities(void);
 		void destroy_egd_strides(void);
 		void destroy_egd_groups(void);
 
@@ -67,7 +56,6 @@ class EGDDevice : public Device {
 		struct	grpconf* grp_;
 		size_t*	strides_;
 		unsigned int ngrp_;
-		EGDCapabilities* egdcap_;
 };
 
 }

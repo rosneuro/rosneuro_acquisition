@@ -5,8 +5,9 @@
 
 namespace rosneuro {
 
-bool AcquisitionConverter::ToMessage(const DeviceData* data, rosneuro_acquisition_msgs::Acquisition& msg) {
+bool AcquisitionConverter::ToMessage(const DeviceData* data, rosneuro_msgs::NeuroData& msg) {
 
+	/*
 	// Clearing the message before filling it
 	AcquisitionConverter::ClearMessage(msg);
 
@@ -51,30 +52,25 @@ bool AcquisitionConverter::ToMessage(const DeviceData* data, rosneuro_acquisitio
 	msg.tri_data.layout.dim[1].stride	= data->sframe;
 	msg.tri_data.data.assign(&(tri[0]), &(tri[data->ntri*data->sframe]));
 
-	/*
 	for(auto i = msg.eeg_labels.begin(); i<msg.eeg_labels.end(); ++i)
 		std::cout<<(*i)<<std::endl;
 	
 	for(auto i = msg.exg_labels.begin(); i<msg.exg_labels.end(); ++i)
 		std::cout<<(*i)<<std::endl;
-		*/
-
+*/
 	return true;
 }
 
-bool AcquisitionConverter::FromMessage(const rosneuro_acquisition_msgs::Acquisition& msg, DeviceData& data) {
-	
-	return true;
-}
 
-void AcquisitionConverter::ClearMessage(rosneuro_acquisition_msgs::Acquisition& msg) {
+void AcquisitionConverter::ClearMessage(rosneuro_msgs::NeuroData& msg) {
 
+	/*
 	// Clearing general information
-	msg.sampling_rate	= 0;
-	msg.nsamples		= 0;
-	msg.eeg_nchannels	= 0;
-	msg.exg_nchannels	= 0;
-	msg.tri_nchannels	= 0;
+	msg.info.sampling_rate	= 0;
+	msg.info.nsamples		= 0;
+	msg.info.neeg			= 0;
+	msg.info.nexg			= 0;
+	msg.info.ntri			= 0;
 
 	// Clearing multilayer message
 	msg.eeg_data.layout.dim.clear();
@@ -92,8 +88,26 @@ void AcquisitionConverter::ClearMessage(rosneuro_acquisition_msgs::Acquisition& 
 	// Clearing label vectors
 	msg.eeg_labels.clear();
 	msg.exg_labels.clear();
-
+	*/
 }
+
+void AcquisitionConverter::ClearInfoMessage(rosneuro_msgs::DeviceInfo& info) {
+
+	info.sampling_rate	= 0;
+	info.nsamples		= 0;
+	info.neeg			= 0;
+	info.nexg			= 0;
+	info.ntri			= 0;
+
+	info.model.clear();
+	info.id.clear();
+	info.prefiltering.clear();
+	info.leeg.clear();
+	info.lexg.clear();
+	info.ltri.clear();
+}
+
+//void AcquisitionConverter::InitMessage(const DeviceData
 
 
 }

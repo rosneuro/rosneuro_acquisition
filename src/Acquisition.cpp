@@ -27,7 +27,7 @@ bool Acquisition::configure(void) {
 	ros::param::param("~fs", this->fs_, 16.0f);
 	ros::param::param("~reopen", this->reopen_, true);
 
-	this->pub_ = this->nh_.advertise<rosneuro_acquisition_msgs::Acquisition>(this->topic_, 1);
+	this->pub_ = this->nh_.advertise<rosneuro_msgs::NeuroData>(this->topic_, 1);
 
 	return true;
 }

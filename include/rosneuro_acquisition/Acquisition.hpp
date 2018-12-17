@@ -3,7 +3,8 @@
 
 #include <ros/ros.h>
 #include "rosneuro_acquisition/DeviceFactory.hpp"
-#include "rosneuro_acquisition_msgs/Acquisition.h"
+#include "rosneuro_msgs/NeuroData.h"
+#include "rosneuro_msgs/DeviceInfo.h"
 #include "rosneuro_acquisition/AcquisitionConverter.hpp"
 
 
@@ -33,7 +34,7 @@ class Acquisition {
 		std::string		devname_;
 		float			fs_;
 		bool			reopen_;
-		rosneuro_acquisition_msgs::Acquisition msg_;
+		rosneuro_msgs::NeuroData msg_;
 
 
 

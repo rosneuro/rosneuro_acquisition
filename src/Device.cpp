@@ -7,24 +7,9 @@ namespace rosneuro {
 
 Device::Device(void) {
 	this->name_  = "undefined";
-	this->model_ = "undefined";
-	this->id_	 = "undefined";
-	this->sampling_rate_ = 0;
 }
 
 Device::~Device(void) {}
-
-std::string Device::GetModel(void) {
-	return this->model_;
-}
-
-std::string Device::GetId(void) {
-	return this->id_;
-}
-
-unsigned int Device::GetSamplingRate(void) {
-	return this->sampling_rate_;
-}
 
 std::string Device::GetName(void) {
 	return this->name_;
@@ -32,6 +17,10 @@ std::string Device::GetName(void) {
 
 void Device::Who(void) {
 	printf("[%s] - %s device\n", this->GetName().c_str(), this->GetName().c_str());
+}
+
+DeviceCapabilities* Device::GetCapabilities(void) {
+	return &(this->cap_);
 }
 
 DeviceData* Device::GetData(void) {

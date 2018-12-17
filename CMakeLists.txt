@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 find_package(catkin REQUIRED COMPONENTS 
 			 roscpp 
 			 std_msgs
-			 rosneuro_acquisition_msgs)
+			 rosneuro_msgs)
 
 find_package(PkgConfig)
 
@@ -23,7 +23,7 @@ catkin_package(
   CATKIN_DEPENDS
   	roscpp
 	std_msgs
-	rosneuro_acquisition_msgs
+	rosneuro_msgs
 
   DEPENDS
 )

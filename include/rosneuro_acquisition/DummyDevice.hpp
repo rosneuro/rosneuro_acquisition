@@ -24,6 +24,9 @@ class DummyDevice : public Device {
 		size_t Get(void);
 		size_t GetAvailable(void);
 		void Dump(void);
+
+	private:
+		std::string name_;
 };
 
 }
