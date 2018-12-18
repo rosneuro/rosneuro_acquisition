@@ -32,7 +32,7 @@ void AcquisitionTools::ClearDataMessage(rosneuro_msgs::NeuroData& msg) {
 
 }
 
-bool AcquisitionTools::SetMessage(const DeviceCapabilities* cap, rosneuro_msgs::NeuroData& msg) {
+bool AcquisitionTools::SetMessageDevice(const DeviceCapabilities* cap, rosneuro_msgs::NeuroData& msg) {
 
 	if(cap == nullptr)
 		return false;
@@ -41,17 +41,21 @@ bool AcquisitionTools::SetMessage(const DeviceCapabilities* cap, rosneuro_msgs::
 	msg.header.frame_id		= "0";
 
 	// Set the DeviceInfo
-	msg.info.model			= cap->model;
-	msg.info.id				= cap->id;
-	msg.info.prefiltering	= cap->prefiltering;
-	msg.info.sampling_rate	= cap->sampling_rate;
-	msg.info.neeg			= cap->neeg;
-	msg.info.nexg			= cap->nexg;
-	msg.info.ntri			= cap->ntri;
-	msg.info.nsamples		= cap->nsamples;
-	msg.info.leeg			= cap->leeg;
-	msg.info.lexg			= cap->lexg;
-	msg.info.ltri			= cap->ltri;
+	msg.info_device.model			= cap->model;
+	msg.info_device.id				= cap->id;
+	msg.info_device.sampling_rate	= cap->sampling_rate;
+	msg.info_device.nsamples		= cap->nsamples;
+	
+	return true;
+}
+/*
+	
+	msg.info_device.neeg			= cap->neeg;
+	msg.info_device.nexg			= cap->nexg;
+	msg.info_device.ntri			= cap->ntri;
+	msg.info_device.leeg			= cap->leeg;
+	msg.info_device.lexg			= cap->lexg;
+	msg.info_device.ltri			= cap->ltri;
 
 	// Set the data array
 	msg.eeg.layout.dim.push_back(std_msgs::MultiArrayDimension());
@@ -86,7 +90,7 @@ bool AcquisitionTools::SetMessage(const DeviceCapabilities* cap, rosneuro_msgs::
 
 	return true;
 }
-
+*/
 void AcquisitionTools::ClearInfoMessage(rosneuro_msgs::DeviceInfo& info) {
 
 	info.sampling_rate	= 0;

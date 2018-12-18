@@ -6,7 +6,7 @@
 namespace rosneuro {
 
 Acquisition::Acquisition(void) : p_nh_("~") {
-	this->data_		= nullptr;
+	this->neurodata_		= nullptr;
 	this->topic_	= "/neurodata"; 
 	this->run_      = false;
 }
@@ -65,12 +65,12 @@ bool Acquisition::Run(void) {
 	}
 	ROS_INFO("Device correctly configured");
 
-	// Configure the NeuroData message
-	if(AcquisitionTools::SetMessage(this->dev_->GetCapabilities(), this->msg_) == false) {
-		ROS_ERROR("Cannot configure the NeuroData message");
-		return false;
-	}
-	ROS_INFO("NeuroData message correctly configured");
+	//// Configure the NeuroData message
+	//if(AcquisitionTools::SetMessageDevice(this->dev_->GetCapabilities(), this->msg_) == false) {
+	//	ROS_ERROR("Cannot configure the NeuroData message");
+	//	return false;
+	//}
+	//ROS_INFO("NeuroData message correctly configured");
 
 
 	// Debug - Dump device configuration
@@ -88,7 +88,6 @@ bool Acquisition::Run(void) {
 			return false;
 	}
 	
-	DeviceData* tdata;
 	
 	while(this->nh_.ok()) {
 		ros::spinOnce();
@@ -124,11 +123,11 @@ bool Acquisition::Run(void) {
 			continue;
 		}
 
-
+		printf("gsize: %zu\n", gsize);
 		// Publish DeviceData
-		this->data_ = this->dev_->GetData();
-		if(AcquisitionTools::ToMessage(this->data_, this->msg_) == true)
-			this->pub_.publish(this->msg_);
+		this->neurodata_ = this->dev_->GetData();
+		//if(AcquisitionTools::ToMessage(this->data_, this->msg_) == true)
+		//	this->pub_.publish(this->msg_);
 
 		if(asize > 0)
 			ROS_WARN("Running late: Get/Available=%zd/%zd", gsize, asize);

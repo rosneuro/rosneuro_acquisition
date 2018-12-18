@@ -38,12 +38,13 @@ include_directories(${catkin_INCLUDE_DIRS}
 )
 
 add_library(${PROJECT_NAME}
+			src/NeuroData.cpp
 			src/Device.cpp
 			src/EGDDevice.cpp
 			src/DummyDevice.cpp
 			src/DeviceFactory.cpp
 			src/Acquisition.cpp
-			src/AcquisitionTools.cpp
+			#src/AcquisitionTools.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} 

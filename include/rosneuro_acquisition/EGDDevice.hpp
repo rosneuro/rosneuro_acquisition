@@ -32,20 +32,17 @@ class EGDDevice : public Device {
 		void Dump(void);
 			
 	private:
-		void init_egd_capabilities(void);
-		void init_egd_groups(void);
-		void init_egd_strides(void);
-		void init_egd_data(void);
+		void init_dev_capabilities(void);
+		void init_egd_structures(void);
+		void init_neuro_data(void);
 
-		bool setup_egd_capabilities(void);
-		bool setup_egd_groups(void);
-		bool setup_egd_strides(void);
-		bool setup_egd_data(void);
-		bool setup_egd_labels(void);
-		bool setup_egd_frame(float hz);
+		bool setup_dev_capabilities(float hz);
+		bool setup_egd_structures(void);
+		bool setup_neuro_data(void);
+		//bool setup_egd_labels(void);
 
-		void destroy_egd_data(void);
-		void destroy_egd_labels(void);
+		//void destroy_egd_data(void);
+		//void destroy_egd_labels(void);
 		void destroy_egd_strides(void);
 		void destroy_egd_groups(void);
 

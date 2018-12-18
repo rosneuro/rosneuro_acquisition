@@ -2,6 +2,7 @@
 #define ROSNEURO_ACQUISITION_TOOLS_HPP
 
 #include <ros/ros.h>
+#include "rosneuro_acquisition/NeuroData.hpp"
 #include "rosneuro_acquisition/Device.hpp"
 #include "rosneuro_msgs/NeuroData.h"
 #include "rosneuro_msgs/DeviceInfo.h"
@@ -11,8 +12,10 @@ namespace rosneuro {
 class AcquisitionTools {
 
 	public:
-		static bool ToMessage(const DeviceData* data, rosneuro_msgs::NeuroData& msg);
-		static bool SetMessage(const DeviceCapabilities* cap, rosneuro_msgs::NeuroData& msg);
+		static bool ToMessage(const NeuroData* data, rosneuro_msgs::NeuroData& msg);
+		static bool SetMessageDevice(const DeviceCapabilities* cap, rosneuro_msgs::NeuroData& msg);
+		static bool SetMessageDataInfo(const NeuroData* data, rosneuro_msgs::NeuroData& msg);
+
 		static void ClearDataMessage(rosneuro_msgs::NeuroData& msg);
 		static void ClearInfoMessage(rosneuro_msgs::DeviceInfo& info);
 

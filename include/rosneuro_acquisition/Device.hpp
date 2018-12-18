@@ -4,29 +4,30 @@
 #include <string>
 #include <vector>
 
+#include "rosneuro_acquisition/NeuroData.hpp"
+
 namespace rosneuro {
 
-struct DeviceData {
-	size_t			seeg;
-	size_t			sexg;
-	size_t			stri;
-	void*			eeg;
-	void* 			exg;
-	void* 			tri;
-};
+//struct NeuroData {
+//	void*	data;
+//};
+//
+//struct NeuroDataInfo {
+//	std::string					unit;
+//	std::string					transducer;
+//	std::string					prefiltering;
+//	std::vector<double>			minmax;
+//	int							isint;
+//	unsigned int				nchannels;
+//	std::vector<std::string>	labels;
+//	size_t						datasize;
+//};
 
 struct DeviceCapabilities {
-	std::string					model;
-	std::string  				id;
-	std::string	 				prefiltering;
-	unsigned int 				sampling_rate;
-	unsigned int 				neeg;
-    unsigned int 				nexg;
-    unsigned int 				ntri;
-	unsigned int				nsamples;
-	std::vector<std::string>	leeg;
-	std::vector<std::string>	lexg;
-	std::vector<std::string>	ltri;
+	std::string		model;
+	std::string  	id;
+	unsigned int 	sampling_rate;
+	unsigned int	nsamples;
 };
 
 class Device {
@@ -43,7 +44,7 @@ class Device {
 		virtual size_t Get(void)	= 0;
 		virtual size_t GetAvailable(void) = 0;
 
-		virtual DeviceData* GetData(void);
+		virtual NeuroData* GetData(void);
 		virtual DeviceCapabilities* GetCapabilities(void);
 		virtual std::string GetName(void);
 		
@@ -51,9 +52,9 @@ class Device {
 		virtual void Dump(void) {};
 
 	protected:
-		std::string			name_;
-		DeviceData			data_;
-		DeviceCapabilities	cap_;
+		std::string				name_;
+		NeuroData*				neurodata_;
+		DeviceCapabilities		devcap_;
 
 };
 

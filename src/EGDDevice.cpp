@@ -9,54 +9,50 @@ EGDDevice::EGDDevice(void) {
 	
 	this->name_ = "egddev";
 	this->ngrp_ = EGD_DEFAULT_GROUP_NUMBER;
-	this->init_egd_capabilities();
-	this->init_egd_groups();
-	this->init_egd_strides();
-	this->init_egd_data();
+
+	// Initialize device capabilities structure
+	this->init_dev_capabilities();
+
+	// Initialize eegdev structures
+	this->init_egd_structures();
+
+	// Initialize neuro data
+	this->init_neuro_data();
 
 }
 
 EGDDevice::~EGDDevice(void) {
-	this->destroy_egd_data();
+//	this->destroy_egd_data();
+
+	delete this->neurodata_;
 	this->destroy_egd_strides();
 	this->destroy_egd_groups();
 }
 
 bool EGDDevice::Setup(float hz) {
 
-	this->init_egd_groups();
-	this->init_egd_strides();
-	this->init_egd_data();
-
-	
 	
 	// Setup structures
-	if(this->setup_egd_capabilities() == false) {
+	if(this->setup_dev_capabilities(hz) == false) {
 		std::cerr<<"[Error] - Cannot setup capabilities"<<std::endl; 
 		return false;
 	}
 	
-	if(this->setup_egd_frame(hz) == false) {
-		std::cerr<<"[Error] - Cannot setup frame"<<std::endl; 
-		return false;
-	}
 	
-	if(this->setup_egd_groups() == false) {
+	if(this->setup_egd_structures() == false) {
 		std::cerr<<"[Error] - Cannot setup group"<<std::endl; 
 		return false;
 	}
-	if(this->setup_egd_strides() == false) {
-		std::cerr<<"[Error] - Cannot setup strides"<<std::endl; 
-		return false;
-	}
-	if(this->setup_egd_data() == false) {
+	
+	if(this->setup_neuro_data() == false) {
 		std::cerr<<"[Error] - Cannot setup data"<<std::endl; 
 		return false;
 	}
+	/*
 	if(this->setup_egd_labels() == false) {
 		std::cerr<<"[Error] - Cannot setup labels"<<std::endl; 
 		return false;
-	}
+	}*/
 
 	
 	// Setup egd device
@@ -97,7 +93,7 @@ bool EGDDevice::Close(void) {
 		return false;
 	}
 	
-	this->destroy_egd_data();
+	//this->destroy_egd_data();
 	this->destroy_egd_strides();
 	this->destroy_egd_groups();
 
@@ -124,8 +120,8 @@ bool EGDDevice::Stop(void) {
 
 size_t EGDDevice::Get(void) {
 	size_t size;
-	size = egd_get_data(this->egddev_, this->cap_.nsamples, 
-						this->data_.eeg, this->data_.exg, this->data_.tri);
+	size = egd_get_data(this->egddev_, this->devcap_.nsamples, 
+						this->neurodata_->data[0], this->neurodata_->data[1], this->neurodata_->data[2]);
 	if (size == -1) {
 		std::cerr<<"Error reading data: " << std::strerror(errno) << std::endl;
 	}
@@ -141,10 +137,25 @@ size_t EGDDevice::GetAvailable(void) {
 
 void EGDDevice::Dump(void) {
 	printf("[Dump] EGDDevice info:\n");
-	printf(" + Capabilities:\n");
-	printf(" |- Device:       %s\n",	this->cap_.model.c_str());
-	printf(" |- Id:           %s\n",	this->cap_.id.c_str());
-	printf(" |- Sf:           %d Hz\n", this->cap_.sampling_rate);
+	printf(" + Device Capabilities:\n");
+	printf(" |- Model:         %s\n",	this->devcap_.model.c_str());
+	printf(" |- Id:            %s\n",	this->devcap_.id.c_str());
+	printf(" |- Sampling rate: %d Hz\n", this->devcap_.sampling_rate);
+	printf(" |- Frame size:    %d Hz\n", this->devcap_.nsamples);
+	for(auto it = this->neurodata_->info.begin(); it != this->neurodata_->info.end(); ++it) {
+		printf(" + %s group:\n", (*it).name.c_str());
+		printf(" |- unit:         %s\n",	(*it).unit.c_str());
+		printf(" |- transducter:  %s\n",	(*it).transducter.c_str());
+		printf(" |- prefiltering: %s\n",	(*it).prefiltering.c_str());
+		printf(" |- min/max: [%f %f]\n",	(*it).minmax[0], (*it).minmax[1]);
+		printf(" |- isint:       %d\n",		(*it).isint);
+		printf(" |- nchannels:   %u\n",		(*it).nchannels);
+		printf(" |- labels: ");
+		for(auto itl = (*it).labels.begin(); itl != (*it).labels.end(); ++itl)
+			printf("%s ", (*itl).c_str());
+		printf("\n");
+	}
+	/*	
 	printf(" |- Channels:     %d\n",	this->cap_.neeg);
 	printf(" |- Sensors:      %d\n",	this->cap_.nexg);
 	printf(" |- Triggers:     %d\n",	this->cap_.ntri);
@@ -157,6 +168,7 @@ void EGDDevice::Dump(void) {
 	for(auto it=this->cap_.lexg.begin(); it!=this->cap_.lexg.end(); ++it)
 		printf("%s ", (*it).c_str());
 	printf("\n");
+	*/
 }
 
 
@@ -164,72 +176,32 @@ void EGDDevice::Dump(void) {
 /*					Private/protected methods						 */
 /*********************************************************************/
 
-void EGDDevice::init_egd_capabilities(void) {
-	this->cap_.model			= "";
-	this->cap_.id				= "";
-	this->cap_.prefiltering		= "";
-	this->cap_.sampling_rate	= 0;
-	this->cap_.nsamples			= 0;
-	this->cap_.neeg				= 0;
-	this->cap_.nexg				= 0;
-	this->cap_.ntri				= 0;
-	this->cap_.leeg.clear();
-	this->cap_.lexg.clear();
-	this->cap_.ltri.clear();
+void EGDDevice::init_dev_capabilities(void) {
+	this->devcap_.model			= "";
+	this->devcap_.id			= "";
+	this->devcap_.sampling_rate	= 0;
+	this->devcap_.nsamples		= 0;
 }
 
-void EGDDevice::init_egd_groups(void) {
+void EGDDevice::init_egd_structures(void) {
 
+	// Group structure
 	this->grp_ = (grpconf*)malloc(this->ngrp_ * sizeof(grpconf));
 	memset(this->grp_, 0, this->ngrp_*sizeof(struct grpconf));
-}
-
-
-void EGDDevice::init_egd_strides(void) {
+	
+	// Strides
 	this->strides_ = (size_t*)malloc(this->ngrp_ * sizeof(size_t));
 	memset(this->strides_, 0, this->ngrp_ *sizeof(size_t));
 }
 
-void EGDDevice::init_egd_data(void) {
-	this->data_.seeg	= 0;
-	this->data_.sexg	= 0;
-	this->data_.stri	= 0;
-	this->data_.eeg		= nullptr;
-	this->data_.exg  	= nullptr;
-	this->data_.tri		= nullptr;
+void EGDDevice::init_neuro_data(void) {
+	this->neurodata_ = new NeuroData(this->ngrp_);
 }
 
 
 
-bool EGDDevice::setup_egd_capabilities(void) {
-
-	char* model			= nullptr;
-	char* id			= nullptr;
-	unsigned int fs		= 0; 
-	unsigned int neeg	= 0;
-	unsigned int nexg	= 0;
-	unsigned int ntri	= 0;
-	char prefiltering[128];
-
-	// Getting sampling rate
-	if(egd_get_cap(this->egddev_, EGD_CAP_FS, &fs) == -1) {
-		std::cerr<<"[Error] - Cannot get sampling rate: "<<strerror(errno)<<std::endl;
-		return false;
-	}
-
-	// Getting devtype
-	if(egd_get_cap(this->egddev_, EGD_CAP_DEVTYPE, &model) == -1) {
-		std::cerr<<"[Error] - Cannot get device type: "<<strerror(errno)<<std::endl;
-		return false;
-	}
-
-	// Getting devid
-	if(egd_get_cap(this->egddev_, EGD_CAP_DEVID, &id) == -1) {
-		std::cerr<<"[Error] - Cannot get device id: "<<strerror(errno)<<std::endl;
-		return false;
-	}
-
-	// Getting number EEG
+/*
+ 	// Getting number EEG
 	if( (neeg = egd_get_numch(this->egddev_, EGD_EEG)) == -1) {
 		std::cerr<<"[Error] - Cannot get number EEG channels: "<<strerror(errno)<<std::endl;
 		return false;
@@ -252,27 +224,91 @@ bool EGDDevice::setup_egd_capabilities(void) {
 		std::cerr<<"[Error] - Cannot get prefiltering: "<<strerror(errno)<<std::endl;
 		return true; // <---- Not required
 	}
+	*/
+
+bool EGDDevice::setup_dev_capabilities(float hz) {
+
+	char* model			= nullptr;
+	char* id			= nullptr;
+	unsigned int fs		= 0; 
+
+	// Getting sampling rate
+	if(egd_get_cap(this->egddev_, EGD_CAP_FS, &fs) == -1) {
+		std::cerr<<"[Error] - Cannot get sampling rate: "<<strerror(errno)<<std::endl;
+		return false;
+	}
+
+	// Getting devtype
+	if(egd_get_cap(this->egddev_, EGD_CAP_DEVTYPE, &model) == -1) {
+		std::cerr<<"[Error] - Cannot get device type: "<<strerror(errno)<<std::endl;
+		return false;
+	}
+
+	// Getting devid
+	if(egd_get_cap(this->egddev_, EGD_CAP_DEVID, &id) == -1) {
+		std::cerr<<"[Error] - Cannot get device id: "<<strerror(errno)<<std::endl;
+		return false;
+	}
+
 
 	// Populating device capabilities and data structure
-	this->cap_.sampling_rate	= fs;
-	this->cap_.model			= std::string(model);
-	this->cap_.id				= std::string(id);
-	this->cap_.prefiltering		= std::string(prefiltering);
-
-	this->cap_.neeg = neeg;
-	this->cap_.nexg = nexg;
-	this->cap_.ntri = ntri;
+	this->devcap_.sampling_rate	= fs;
+	this->devcap_.model			= std::string(model);
+	this->devcap_.id			= std::string(id);
+	this->devcap_.nsamples		= (size_t)((float)this->devcap_.sampling_rate/hz);
 
 	return true;
 }
 
-bool EGDDevice::setup_egd_strides(void) {
+bool EGDDevice::setup_egd_structures(void) {
 
+	int neeg, nexg, ntri;
+
+	/**** Setting up the groups ****/
 	if(this->grp_ == nullptr) {
 		std::cerr<<"[Error] - Groups are not allocated"<<std::endl;
 		return false;
 	}
+
+	// Getting number EEG, EXG, TRIGGER channels
+	if( (neeg = egd_get_numch(this->egddev_, EGD_EEG)) == -1) {
+		std::cerr<<"[Error] - Cannot get number EEG channels: "<<strerror(errno)<<std::endl;
+		return false;
+	}
 	
+	if( (nexg = egd_get_numch(this->egddev_, EGD_SENSOR)) == -1) {
+		std::cerr<<"[Error] - Cannot get number SENSOR channels: "<<strerror(errno)<<std::endl;
+		return false;
+	}
+
+	if( (ntri = egd_get_numch(this->egddev_, EGD_TRIGGER)) == -1) {
+		std::cerr<<"[Error] - Cannot get number TRIGGER channels: "<<strerror(errno)<<std::endl;
+		return false;
+	}
+
+	this->grp_[0].sensortype = EGD_EEG;
+	this->grp_[0].index		 = 0;
+	this->grp_[0].iarray	 = 0;
+	this->grp_[0].datatype	 = EGD_FLOAT;
+	this->grp_[0].arr_offset = 0;
+	this->grp_[0].nch		 = neeg;
+	
+	this->grp_[1].sensortype = EGD_SENSOR;
+	this->grp_[1].index		 = 0; 
+	this->grp_[1].iarray	 = 1; 
+	this->grp_[1].datatype	 = EGD_FLOAT;
+	this->grp_[1].arr_offset = 0;
+	this->grp_[1].nch	     = nexg;
+	
+	this->grp_[2].sensortype = EGD_TRIGGER;
+	this->grp_[2].index		 = 0; 
+	this->grp_[2].iarray	 = 2;
+	this->grp_[2].datatype	 = EGD_INT32;
+	this->grp_[2].arr_offset = 0;
+	this->grp_[2].nch		 = ntri;
+
+	
+	/**** Setting up the strides ****/
 	if(this->strides_ == nullptr) {
 		std::cerr<<"[Error] - Strides are not allocated"<<std::endl;
 		return false;
@@ -286,26 +322,61 @@ bool EGDDevice::setup_egd_strides(void) {
 	return true;
 }
 
-bool EGDDevice::setup_egd_data(void) {
+bool EGDDevice::setup_neuro_data(void) {
 
 	if(this->strides_ == nullptr) {
 		std::cerr<<"[Error] - Strides are not allocated"<<std::endl;
 		return false;
 	}
 	
-	// Compute sizes so not to call malloc if size == 0
-	this->data_.seeg = this->strides_[0]*this->cap_.nsamples;
-	this->data_.sexg = this->strides_[1]*this->cap_.nsamples;
-	this->data_.stri = this->strides_[2]*this->cap_.nsamples;
+	size_t seeg, sexg, stri;
 
-	this->data_.eeg = this->data_.seeg ? (void*)malloc(this->data_.seeg) : nullptr;
-	this->data_.exg = this->data_.sexg ? (void*)malloc(this->data_.sexg) : nullptr;
-	this->data_.tri = this->data_.stri ? (void*)malloc(this->data_.stri) : nullptr;
+	// Compute sizes so not to call malloc if size == 0
+	seeg = this->strides_[0]*this->devcap_.nsamples;
+	sexg = this->strides_[1]*this->devcap_.nsamples;
+	stri = this->strides_[2]*this->devcap_.nsamples;
+
+	this->neurodata_->data[0] = seeg ? (void*)malloc(seeg) : nullptr;
+	this->neurodata_->data[1] = sexg ? (void*)malloc(sexg) : nullptr;
+	this->neurodata_->data[2] = stri ? (void*)malloc(stri) : nullptr;
+
+
+	// Get additional information
+	char unit[16], transducter[128], filtering[128], label[32];
+	double mm[2];
+	int isint = 0;
+
+	this->neurodata_->info[0].name = "eeg";
+	this->neurodata_->info[1].name = "exg";
+	this->neurodata_->info[2].name = "tri";
+
+	for(auto i = 0; i<this->ngrp_; i++) {
+		egd_channel_info(this->egddev_, this->grp_[i].sensortype, 0, 
+					 EGD_UNIT, unit, EGD_TRANSDUCTER, transducter, 
+					 EGD_PREFILTERING, filtering, EGD_MM_D, mm,
+					 EGD_ISINT, &isint, EGD_EOL);
+
+		this->neurodata_->info[i].unit			= std::string(unit);
+		this->neurodata_->info[i].transducter	= std::string(transducter);
+		this->neurodata_->info[i].prefiltering	= std::string(filtering);
+		this->neurodata_->info[i].minmax[0]		= mm[0];
+		this->neurodata_->info[i].minmax[1]		= mm[1];
+		this->neurodata_->info[i].isint			= isint;
+		this->neurodata_->info[i].nchannels		= this->grp_[i].nch;
+
+		for(auto j = 0; j<this->grp_[i].nch; j++) {
+			egd_channel_info(this->egddev_, this->grp_[i].sensortype, j,
+							 EGD_LABEL, label, EGD_EOL);
+			this->neurodata_->info[i].labels.push_back(std::string(label));
+		}
+	}
+	
+
 
 	return true;
 }
 
-bool EGDDevice::setup_egd_groups(void) {
+/*bool EGDDevice::setup_egd_groups(void) {
 	
 	if(this->grp_ == nullptr) {
 		std::cerr<<"[Error] - Groups are not allocated"<<std::endl;
@@ -335,12 +406,14 @@ bool EGDDevice::setup_egd_groups(void) {
 
 	return true;
 }
+*/
 
-bool EGDDevice::setup_egd_frame(float hz) {
+/*bool EGDDevice::setup_egd_frame(float hz) {
 	this->cap_.nsamples = (size_t)((float)this->cap_.sampling_rate/hz);
 	return true;
-}
+}*/
 
+/*
 bool EGDDevice::setup_egd_labels(void) {
 	
 	int		type;
@@ -373,7 +446,8 @@ bool EGDDevice::setup_egd_labels(void) {
 
 	return true;
 }
-
+*/
+/*
 void EGDDevice::destroy_egd_data(void) {
 	if(this->data_.eeg != nullptr)
 		free(this->data_.eeg);
@@ -387,6 +461,7 @@ void EGDDevice::destroy_egd_data(void) {
 	this->data_.tri    = nullptr;
 	
 }
+*/
 
 
 void EGDDevice::destroy_egd_strides(void) {

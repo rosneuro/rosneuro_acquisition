@@ -20,11 +20,11 @@ void Device::Who(void) {
 }
 
 DeviceCapabilities* Device::GetCapabilities(void) {
-	return &(this->cap_);
+	return &(this->devcap_);
 }
 
-DeviceData* Device::GetData(void) {
-	return &(this->data_);
+NeuroData* Device::GetData(void) {
+	return this->neurodata_;
 }
 
 

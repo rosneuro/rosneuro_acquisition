@@ -4,9 +4,10 @@
 #include <ros/ros.h>
 #include <std_srvs/Empty.h>
 #include "rosneuro_acquisition/DeviceFactory.hpp"
+#include "rosneuro_acquisition/NeuroData.hpp"
 #include "rosneuro_msgs/NeuroData.h"
 #include "rosneuro_msgs/DeviceInfo.h"
-#include "rosneuro_acquisition/AcquisitionTools.hpp"
+//#include "rosneuro_acquisition/AcquisitionTools.hpp"
 
 
 
@@ -42,7 +43,7 @@ class Acquisition {
 		std::string			topic_;
 
 
-		DeviceData* 	data_;
+		NeuroData*		neurodata_;
 		DeviceFactory	factory_;
 		std::unique_ptr<Device>	dev_;
 
