@@ -65,12 +65,13 @@ bool Acquisition::Run(void) {
 	}
 	ROS_INFO("Device correctly configured");
 
-	//// Configure the NeuroData message
-	//if(AcquisitionTools::SetMessageDevice(this->dev_->GetCapabilities(), this->msg_) == false) {
-	//	ROS_ERROR("Cannot configure the NeuroData message");
-	//	return false;
-	//}
-	//ROS_INFO("NeuroData message correctly configured");
+	// Configure the message
+	if((AcquisitionTools::ConfigureMessage(this->dev_->GetCapabilities(), this->msg_) == false) ||
+	   (AcquisitionTools::ConfigureMessage(this->dev_->GetData(), this->msg_) == false) ) {
+		ROS_ERROR("Cannot configure the NeuroData message");
+		return false;
+	}
+	ROS_INFO("NeuroData message correctly configured");
 
 
 	// Debug - Dump device configuration
@@ -124,9 +125,9 @@ bool Acquisition::Run(void) {
 		}
 
 		// Publish DeviceData
-		data = this->dev_->GetData();
-		//if(AcquisitionTools::ToMessage(this->data_, this->msg_) == true)
-		//	this->pub_.publish(this->msg_);
+		//data = this->dev_->GetData();
+		if(AcquisitionTools::ToMessage(this->dev_->GetData(), this->msg_) == true)
+			this->pub_.publish(this->msg_);
 
 		if(asize > 0)
 			ROS_WARN("Running late: Get/Available=%zd/%zd", gsize, asize);

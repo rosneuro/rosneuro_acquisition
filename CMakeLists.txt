@@ -44,7 +44,7 @@ add_library(${PROJECT_NAME}
 			src/DummyDevice.cpp
 			src/DeviceFactory.cpp
 			src/Acquisition.cpp
-			#src/AcquisitionTools.cpp
+			src/AcquisitionTools.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} 

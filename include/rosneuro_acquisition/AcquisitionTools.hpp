@@ -13,11 +13,11 @@ class AcquisitionTools {
 
 	public:
 		static bool ToMessage(const NeuroData* data, rosneuro_msgs::NeuroData& msg);
-		static bool SetMessageDevice(const DeviceCapabilities* cap, rosneuro_msgs::NeuroData& msg);
-		static bool SetMessageDataInfo(const NeuroData* data, rosneuro_msgs::NeuroData& msg);
+		static bool ConfigureMessage(const DeviceCap* cap, rosneuro_msgs::NeuroData& msg);
+		static bool ConfigureMessage(const NeuroData* data, rosneuro_msgs::NeuroData& msg);
 
 		static void ClearDataMessage(rosneuro_msgs::NeuroData& msg);
-		static void ClearInfoMessage(rosneuro_msgs::DeviceInfo& info);
+		//static void ClearInfoMessage(rosneuro_msgs::DeviceInfo& info);
 
 	private:
 		AcquisitionTools(void) {};

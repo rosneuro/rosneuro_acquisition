@@ -7,7 +7,7 @@
 #include "rosneuro_acquisition/NeuroData.hpp"
 #include "rosneuro_msgs/NeuroData.h"
 #include "rosneuro_msgs/DeviceInfo.h"
-//#include "rosneuro_acquisition/AcquisitionTools.hpp"
+#include "rosneuro_acquisition/AcquisitionTools.hpp"
 
 
 

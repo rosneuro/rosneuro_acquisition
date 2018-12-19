@@ -5,18 +5,18 @@
 
 namespace rosneuro {
 
-bool AcquisitionTools::ToMessage(const DeviceData* data, rosneuro_msgs::NeuroData& msg) {
+bool AcquisitionTools::ToMessage(const NeuroData* data, rosneuro_msgs::NeuroData& msg) {
 
 	// Clearing the message before filling it
 	AcquisitionTools::ClearDataMessage(msg);
 
-	float* eeg = (float*)data->eeg;
-	float* exg = (float*)data->exg;
-	int32_t* tri = (int32_t*)data->tri;
+	float* eeg = (float*)data->data[0];
+	float* exg = (float*)data->data[1];
+	int32_t* tri = (int32_t*)data->data[2];
 	
-	msg.eeg.data.assign(&(eeg[0]), &(eeg[msg.info.neeg*msg.info.nsamples]));
-	msg.exg.data.assign(&(exg[0]), &(exg[msg.info.nexg*msg.info.nsamples]));
-	msg.tri.data.assign(&(tri[0]), &(tri[msg.info.ntri*msg.info.nsamples]));
+	msg.eeg.data.assign(&(eeg[0]), &(eeg[msg.info_eeg.nchannels*msg.info_device.nsamples]));
+	msg.exg.data.assign(&(exg[0]), &(exg[msg.info_exg.nchannels*msg.info_device.nsamples]));
+	msg.tri.data.assign(&(tri[0]), &(tri[msg.info_tri.nchannels*msg.info_device.nsamples]));
 
 	msg.header.stamp = ros::Time::now();
 
@@ -32,7 +32,7 @@ void AcquisitionTools::ClearDataMessage(rosneuro_msgs::NeuroData& msg) {
 
 }
 
-bool AcquisitionTools::SetMessageDevice(const DeviceCapabilities* cap, rosneuro_msgs::NeuroData& msg) {
+bool AcquisitionTools::ConfigureMessage(const DeviceCap* cap, rosneuro_msgs::NeuroData& msg) {
 
 	if(cap == nullptr)
 		return false;
@@ -48,6 +48,43 @@ bool AcquisitionTools::SetMessageDevice(const DeviceCapabilities* cap, rosneuro_
 	
 	return true;
 }
+
+bool AcquisitionTools::ConfigureMessage(const NeuroData* data, rosneuro_msgs::NeuroData& msg) {
+
+	if(data == nullptr)
+		return false;
+
+	msg.info_eeg.unit			= data->info[0].unit;
+	msg.info_eeg.transducter	= data->info[0].transducter;
+	msg.info_eeg.prefiltering	= data->info[0].prefiltering;
+	msg.info_eeg.isint			= data->info[0].isint;
+	msg.info_eeg.nchannels		= data->info[0].nchannels;
+	msg.info_eeg.labels			= data->info[0].labels;
+	msg.info_eeg.minmax.push_back(data->info[0].minmax[0]);
+	msg.info_eeg.minmax.push_back(data->info[0].minmax[1]);
+
+	msg.info_exg.unit			= data->info[1].unit;
+	msg.info_exg.transducter	= data->info[1].transducter;
+	msg.info_exg.prefiltering	= data->info[1].prefiltering;
+	msg.info_exg.isint			= data->info[1].isint;
+	msg.info_exg.nchannels		= data->info[1].nchannels;
+	msg.info_exg.labels			= data->info[1].labels;
+	msg.info_exg.minmax.push_back(data->info[1].minmax[0]);
+	msg.info_exg.minmax.push_back(data->info[1].minmax[1]);
+	
+	msg.info_tri.unit			= data->info[2].unit;
+	msg.info_tri.transducter	= data->info[2].transducter;
+	msg.info_tri.prefiltering	= data->info[2].prefiltering;
+	msg.info_tri.isint			= data->info[2].isint;
+	msg.info_tri.nchannels		= data->info[2].nchannels;
+	msg.info_tri.labels			= data->info[2].labels;
+	msg.info_tri.minmax.push_back(data->info[2].minmax[0]);
+	msg.info_tri.minmax.push_back(data->info[2].minmax[1]);
+
+	return true;
+}
+
+
 /*
 	
 	msg.info_device.neeg			= cap->neeg;
@@ -90,7 +127,6 @@ bool AcquisitionTools::SetMessageDevice(const DeviceCapabilities* cap, rosneuro_
 
 	return true;
 }
-*/
 void AcquisitionTools::ClearInfoMessage(rosneuro_msgs::DeviceInfo& info) {
 
 	info.sampling_rate	= 0;
@@ -107,6 +143,7 @@ void AcquisitionTools::ClearInfoMessage(rosneuro_msgs::DeviceInfo& info) {
 	info.ltri.clear();
 }
 
+*/
 
 
 }
