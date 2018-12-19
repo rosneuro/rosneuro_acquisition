@@ -8,22 +8,7 @@
 
 namespace rosneuro {
 
-//struct NeuroData {
-//	void*	data;
-//};
-//
-//struct NeuroDataInfo {
-//	std::string					unit;
-//	std::string					transducer;
-//	std::string					prefiltering;
-//	std::vector<double>			minmax;
-//	int							isint;
-//	unsigned int				nchannels;
-//	std::vector<std::string>	labels;
-//	size_t						datasize;
-//};
-
-struct DeviceCapabilities {
+struct DeviceCap {
 	std::string		model;
 	std::string  	id;
 	unsigned int 	sampling_rate;
@@ -45,16 +30,16 @@ class Device {
 		virtual size_t GetAvailable(void) = 0;
 
 		virtual NeuroData* GetData(void);
-		virtual DeviceCapabilities* GetCapabilities(void);
+		virtual DeviceCap* GetCapabilities(void);
+
 		virtual std::string GetName(void);
-		
 		virtual void Who(void);
-		virtual void Dump(void) {};
+		virtual void Dump(void);
 
 	protected:
-		std::string				name_;
-		NeuroData*				neurodata_;
-		DeviceCapabilities		devcap_;
+		std::string	name_;
+		NeuroData	neurodata_;
+		DeviceCap	devicecap_;
 
 };
 

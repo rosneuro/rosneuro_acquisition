@@ -6,7 +6,6 @@
 namespace rosneuro {
 
 Acquisition::Acquisition(void) : p_nh_("~") {
-	this->neurodata_		= nullptr;
 	this->topic_	= "/neurodata"; 
 	this->run_      = false;
 }
@@ -41,6 +40,7 @@ bool Acquisition::Run(void) {
 
 	size_t gsize = -1;
 	size_t asize = -1;
+	NeuroData*	data;
 	ros::Rate r(60);
 	
 	// Configure acquisition
@@ -123,9 +123,8 @@ bool Acquisition::Run(void) {
 			continue;
 		}
 
-		printf("gsize: %zu\n", gsize);
 		// Publish DeviceData
-		this->neurodata_ = this->dev_->GetData();
+		data = this->dev_->GetData();
 		//if(AcquisitionTools::ToMessage(this->data_, this->msg_) == true)
 		//	this->pub_.publish(this->msg_);
 

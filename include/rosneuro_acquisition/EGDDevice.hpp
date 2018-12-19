@@ -7,6 +7,7 @@
 #include <cstring>
 #include <eegdev.h>
 #include "rosneuro_acquisition/Device.hpp"
+#include "rosneuro_acquisition/NeuroData.hpp"
 
 #define EGD_DEFAULT_GROUP_NUMBER 3
 #define EGD_MAXSIZE_CHANNEL_NAME 32
@@ -27,9 +28,6 @@ class EGDDevice : public Device {
 		bool Stop(void);
 		size_t Get(void);
 		size_t GetAvailable(void);
-
-		
-		void Dump(void);
 			
 	private:
 		void init_dev_capabilities(void);
@@ -39,12 +37,8 @@ class EGDDevice : public Device {
 		bool setup_dev_capabilities(float hz);
 		bool setup_egd_structures(void);
 		bool setup_neuro_data(void);
-		//bool setup_egd_labels(void);
-
-		//void destroy_egd_data(void);
-		//void destroy_egd_labels(void);
-		void destroy_egd_strides(void);
-		void destroy_egd_groups(void);
+		
+		void destroy_egd_structures(void);
 
 		size_t get_egd_size(int egdtype);
 

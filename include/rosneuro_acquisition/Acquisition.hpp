@@ -43,7 +43,6 @@ class Acquisition {
 		std::string			topic_;
 
 
-		NeuroData*		neurodata_;
 		DeviceFactory	factory_;
 		std::unique_ptr<Device>	dev_;
 
