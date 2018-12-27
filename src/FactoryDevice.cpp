@@ -1,11 +1,11 @@
-#ifndef ROSNEURO_ACQUISITION_DEVICEFACTORY_CPP
-#define ROSNEURO_ACQUISITION_DEVICEFACTORY_CPP
+#ifndef ROSNEURO_ACQUISITION_FACTORY_DEVICE_CPP
+#define ROSNEURO_ACQUISITION_FACTORY_DEVICE_CPP
 
-#include "rosneuro_acquisition/DeviceFactory.hpp"
+#include "rosneuro_acquisition/FactoryDevice.hpp"
 
 namespace rosneuro {
 
-std::unique_ptr<Device> DeviceFactory::createDevice(unsigned int type) {
+std::unique_ptr<Device> FactoryDevice::createDevice(unsigned int type) {
 
 	std::unique_ptr<Device> dev;
 	switch(type) {
@@ -16,7 +16,7 @@ std::unique_ptr<Device> DeviceFactory::createDevice(unsigned int type) {
 			dev = std::unique_ptr<DummyDevice>(new DummyDevice);
 			break;
 		default:
-			printf("[DeviceFactory] - Unknown device type required: %u\n", type);
+			printf("[FactoryDevice] - Unknown device type required: %u\n", type);
 			dev = std::unique_ptr<Device>(nullptr);
 			break;
 	}

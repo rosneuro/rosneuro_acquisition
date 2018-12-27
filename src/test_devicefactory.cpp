@@ -1,4 +1,4 @@
-#include "rosneuro_acquisition/DeviceFactory.hpp"
+#include "rosneuro_acquisition/FactoryDevice.hpp"
 #include <unistd.h>
 
 using namespace rosneuro;
@@ -6,7 +6,7 @@ using namespace rosneuro;
 int main(int argc, char** argv) {
 
 
-	DeviceFactory factory;
+	FactoryDevice factory;
 
 	std::unique_ptr<Device> egddev   = factory.createDevice(DeviceType::EGDDEV);
 	std::unique_ptr<Device> dummydev = factory.createDevice(DeviceType::DUMMYDEV);
@@ -14,11 +14,10 @@ int main(int argc, char** argv) {
 	egddev->Who();
 	dummydev->Who();
 
-	std::cout<<">>>>>>>>> TEST EGDDEV <<<<<<<<<<<<<<<"<<std::endl;
+	std::cout<<"\n>>>>>>>>> TEST EGDDEV <<<<<<<<<<<<<<<"<<std::endl;
 	if(egddev->Open(argv[1]) == false)
 		return -1;
 		
-	sleep(1);
 	
 	if(egddev->Setup(16.0f) == false) {
 		std::cerr<<"SETUP ERROR"<<std::endl;
@@ -26,13 +25,14 @@ int main(int argc, char** argv) {
 	}
 
 
-	egddev->Dump();
+	egddev->eeg.dump();
+	egddev->exg.dump();
+	egddev->tri.dump();
 	
-	std::cout<<">>>>>>>>> TEST DUMMYDEV <<<<<<<<<<<<<<<"<<std::endl;
+	std::cout<<"\n>>>>>>>>> TEST DUMMYDEV <<<<<<<<<<<<<<<"<<std::endl;
 	if(dummydev->Open("") == false)
 		return -1;
 		
-	sleep(1);
 	
 	if(dummydev->Setup(16.0f) == false) {
 		std::cerr<<"SETUP ERROR"<<std::endl;
@@ -40,7 +40,6 @@ int main(int argc, char** argv) {
 	}
 
 
-	dummydev->Dump();
 
 	return 0;
 }

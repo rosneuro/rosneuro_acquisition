@@ -4,15 +4,13 @@
 #include <string>
 #include <vector>
 
-#include "rosneuro_acquisition/NeuroData.hpp"
+#include "rosneuro_data/NeuroData.hpp"
 
 namespace rosneuro {
 
-struct DeviceCap {
+struct DeviceInfo {
 	std::string		model;
 	std::string  	id;
-	unsigned int 	sampling_rate;
-	unsigned int	nsamples;
 };
 
 class Device {
@@ -28,9 +26,8 @@ class Device {
 		virtual bool   Stop(void)	= 0;
 		virtual size_t Get(void)	= 0;
 		virtual size_t GetAvailable(void) = 0;
+		virtual unsigned int GetSamplingRate(void);
 
-		virtual NeuroData* GetData(void);
-		virtual DeviceCap* GetCapabilities(void);
 
 		virtual std::string GetName(void);
 		virtual void Who(void);
@@ -38,8 +35,13 @@ class Device {
 
 	protected:
 		std::string	name_;
-		NeuroData	neurodata_;
-		DeviceCap	devicecap_;
+		unsigned int sampling_rate_;
+
+	public:
+		NeuroData<float>	eeg;
+		NeuroData<float>	exg;
+		NeuroData<int32_t>	tri;
+		DeviceInfo	devinfo;
 
 };
 

@@ -6,6 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 find_package(catkin REQUIRED COMPONENTS 
 			 roscpp 
 			 std_msgs
+			 rosneuro_data
 			 rosneuro_msgs)
 
 find_package(PkgConfig)
@@ -23,6 +24,7 @@ catkin_package(
   CATKIN_DEPENDS
   	roscpp
 	std_msgs
+	rosneuro_data
 	rosneuro_msgs
 
   DEPENDS
@@ -38,13 +40,17 @@ include_directories(${catkin_INCLUDE_DIRS}
 )
 
 add_library(${PROJECT_NAME}
-			src/NeuroData.cpp
-			src/Device.cpp
-			src/EGDDevice.cpp
-			src/DummyDevice.cpp
-			src/DeviceFactory.cpp
-			src/Acquisition.cpp
-			src/AcquisitionTools.cpp
+	src/Device.cpp
+	src/EGDDevice.cpp
+	src/DummyDevice.cpp
+	src/FactoryDevice.cpp
+	src/Acquisition.cpp
+	#src/NeuroDataTools.cpp
+	#src/Writer.cpp
+	#src/XDFWriter.cpp
+	#src/DummyWriter.cpp
+	#src/FactoryWriter.cpp
+			#src/Recorder.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} 
@@ -67,14 +73,5 @@ target_link_libraries(test_devicefactory rosneuro_acquisition)
 
 add_executable(test_egddevice src/test_egddevice.cpp)
 target_link_libraries(test_egddevice rosneuro_acquisition)
-
-#add_executable(test_rule1 src/test_rule1.cpp)
-#target_link_libraries(test_rule1 rosneuro_acquisition)
-#
-#add_executable(test_rule2 src/test_rule2.cpp)
-#target_link_libraries(test_rule2 rosneuro_acquisition)
-#
-#add_executable(test_rule3 src/test_rule3.cpp)
-#target_link_libraries(test_rule3 rosneuro_acquisition)
 
 

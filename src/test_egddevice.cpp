@@ -12,7 +12,6 @@ int main(int argc, char** argv) {
 	if(egddev.Open(argv[1]) == false)
 		return -1;
 		
-	sleep(1);
 	
 	if(egddev.Setup(16.0f) == false) {
 		std::cerr<<"SETUP ERROR"<<std::endl;
@@ -20,7 +19,9 @@ int main(int argc, char** argv) {
 	}
 
 
-	egddev.Dump();
+	egddev.eeg.dump();
+	egddev.exg.dump();
+	egddev.tri.dump();
 
 	egddev.Close();
 

@@ -6,11 +6,10 @@
 #include <iostream>
 #include <cstring>
 #include <eegdev.h>
+#include "rosneuro_data/NeuroData.hpp"
 #include "rosneuro_acquisition/Device.hpp"
-#include "rosneuro_acquisition/NeuroData.hpp"
 
-#define EGD_DEFAULT_GROUP_NUMBER 3
-#define EGD_MAXSIZE_CHANNEL_NAME 32
+#define EGD_DATA_GROUPS 3
 
 namespace rosneuro {
 
@@ -32,21 +31,19 @@ class EGDDevice : public Device {
 	private:
 		void init_dev_capabilities(void);
 		void init_egd_structures(void);
-		void init_neuro_data(void);
 
-		bool setup_dev_capabilities(float hz);
+		bool setup_dev_capabilities(void);
+		bool setup_neuro_data(float hz);
+		void setup_neuro_info(NeuroDataInfo* data, size_t nch, unsigned int index);
 		bool setup_egd_structures(void);
-		bool setup_neuro_data(void);
 		
 		void destroy_egd_structures(void);
 
-		size_t get_egd_size(int egdtype);
 
 	protected:
 		struct  eegdev*	egddev_;
 		struct	grpconf* grp_;
-		size_t*	strides_;
-		unsigned int ngrp_;
+		size_t* strides_;
 };
 
 }

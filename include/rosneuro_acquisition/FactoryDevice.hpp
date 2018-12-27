@@ -1,5 +1,5 @@
-#ifndef ROSNEURO_ACQUISITION_DEVICEFACTORY_HPP
-#define ROSNEURO_ACQUISITION_DEVICEFACTORY_HPP
+#ifndef ROSNEURO_ACQUISITION_FACTORY_DEVICE_HPP
+#define ROSNEURO_ACQUISITION_FACTORY_DEVICE_HPP
 
 #include <memory>
 #include "rosneuro_acquisition/Device.hpp"
@@ -10,7 +10,7 @@ namespace rosneuro {
 
 enum DeviceType {EGDDEV, DUMMYDEV};
 
-class DeviceFactory {
+class FactoryDevice {
 
 	public:
 		std::unique_ptr<Device> createDevice(unsigned int type = DeviceType::EGDDEV);

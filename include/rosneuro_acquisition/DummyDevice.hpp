@@ -23,7 +23,6 @@ class DummyDevice : public Device {
 		bool Stop(void);
 		size_t Get(void);
 		size_t GetAvailable(void);
-		void Dump(void);
 
 	private:
 		std::string name_;
