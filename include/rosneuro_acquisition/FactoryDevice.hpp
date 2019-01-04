@@ -13,7 +13,7 @@ enum DeviceType {EGDDEV, DUMMYDEV};
 class FactoryDevice {
 
 	public:
-		std::unique_ptr<Device> createDevice(unsigned int type = DeviceType::EGDDEV);
+		std::unique_ptr<Device> createDevice(NeuroFrame* frame, unsigned int type = DeviceType::EGDDEV);
 
 };
 

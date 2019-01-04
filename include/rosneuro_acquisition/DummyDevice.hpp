@@ -13,7 +13,7 @@ namespace rosneuro {
 class DummyDevice : public Device {
 
 	public:
-		DummyDevice(void);
+		DummyDevice(NeuroFrame* frame);
 		virtual ~DummyDevice(void);
 
 		bool Setup(float fs);
@@ -24,8 +24,6 @@ class DummyDevice : public Device {
 		size_t Get(void);
 		size_t GetAvailable(void);
 
-	private:
-		std::string name_;
 };
 
 }

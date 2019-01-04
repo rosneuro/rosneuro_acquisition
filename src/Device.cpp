@@ -5,9 +5,9 @@
 
 namespace rosneuro {
 
-Device::Device(void) : eeg("EEG"), exg("EXG"), tri("TRI") {
-	this->name_			 = "undefined";
-	this->sampling_rate_ = -1;
+Device::Device(NeuroFrame* frame)  {
+	this->name_	 = "undefined";
+	this->frame_ = frame;
 }
 
 Device::~Device(void) {}
@@ -16,17 +16,14 @@ std::string Device::GetName(void) {
 	return this->name_;
 }
 
-unsigned int Device::GetSamplingRate(void) {
-	return this->sampling_rate_;
-}
 
 void Device::Who(void) {
-	printf("[%s] - %s device\n", this->GetName().c_str(), this->GetName().c_str());
+	printf("[%s] - %s device\n", this->name_.c_str(), this->name_.c_str());
 }
 
 
 void Device::Dump(void) {
-	printf("[Dump] %s info:\n", this->GetName().c_str());
+	printf("[Dump] %s info:\n", this->name_.c_str());
 	printf(" |- Model:         %s\n",	this->devinfo.model.c_str());
 	printf(" |- Id:            %s\n",	this->devinfo.id.c_str());
 }

@@ -6,7 +6,7 @@
 #include "rosneuro_acquisition/FactoryDevice.hpp"
 #include "rosneuro_data/NeuroData.hpp"
 #include "rosneuro_data/NeuroDataTools.hpp"
-#include "rosneuro_msgs/NeuroDataSet.h"
+#include "rosneuro_msgs/NeuroFrame.h"
 #include "rosneuro_msgs/GetAcquisitionInfo.h"
 
 
@@ -61,7 +61,9 @@ class Acquisition {
 		float			fs_;
 		bool			reopen_;
 		bool			autostart_;
-		rosneuro_msgs::NeuroDataSet msg_;
+		
+		rosneuro_msgs::NeuroFrame msg_;
+		NeuroFrame	frame_;
 
 
 

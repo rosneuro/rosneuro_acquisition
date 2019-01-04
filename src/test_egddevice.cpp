@@ -1,12 +1,13 @@
 #include "rosneuro_acquisition/EGDDevice.hpp"
+#include "rosneuro_data/NeuroData.hpp"
 
 #include <unistd.h>
 
 int main(int argc, char** argv) {
 
 
-
-	rosneuro::EGDDevice egddev;
+	rosneuro::NeuroFrame	frame;
+	rosneuro::EGDDevice		egddev(&frame);
 
 
 	if(egddev.Open(argv[1]) == false)
@@ -19,9 +20,9 @@ int main(int argc, char** argv) {
 	}
 
 
-	egddev.eeg.dump();
-	egddev.exg.dump();
-	egddev.tri.dump();
+	frame.eeg.dump();
+	frame.exg.dump();
+	frame.tri.dump();
 
 	egddev.Close();
 

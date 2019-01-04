@@ -16,7 +16,7 @@ struct DeviceInfo {
 class Device {
 	
 	public:
-		Device(void);
+		Device(NeuroFrame* frame);
 		virtual ~Device(void);
 
 		virtual bool   Setup(float fs) = 0;
@@ -26,7 +26,6 @@ class Device {
 		virtual bool   Stop(void)	= 0;
 		virtual size_t Get(void)	= 0;
 		virtual size_t GetAvailable(void) = 0;
-		virtual unsigned int GetSamplingRate(void);
 
 
 		virtual std::string GetName(void);
@@ -35,12 +34,9 @@ class Device {
 
 	protected:
 		std::string	name_;
-		unsigned int sampling_rate_;
+		NeuroFrame* frame_;
 
 	public:
-		NeuroData<float>	eeg;
-		NeuroData<float>	exg;
-		NeuroData<int32_t>	tri;
 		DeviceInfo	devinfo;
 
 };

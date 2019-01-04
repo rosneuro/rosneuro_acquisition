@@ -17,7 +17,7 @@ namespace rosneuro {
 class EGDDevice : public Device {
 
 	public:
-		EGDDevice(void);
+		EGDDevice(NeuroFrame* frame);
 		virtual ~EGDDevice(void);
 
 		bool Setup(float fs);

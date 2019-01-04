@@ -1,4 +1,5 @@
 #include "rosneuro_acquisition/FactoryDevice.hpp"
+#include "rosneuro_data/NeuroData.hpp"
 #include <unistd.h>
 
 using namespace rosneuro;
@@ -7,9 +8,10 @@ int main(int argc, char** argv) {
 
 
 	FactoryDevice factory;
+	rosneuro::NeuroFrame	frame;
 
-	std::unique_ptr<Device> egddev   = factory.createDevice(DeviceType::EGDDEV);
-	std::unique_ptr<Device> dummydev = factory.createDevice(DeviceType::DUMMYDEV);
+	std::unique_ptr<Device> egddev   = factory.createDevice(&frame, DeviceType::EGDDEV);
+	std::unique_ptr<Device> dummydev = factory.createDevice(&frame, DeviceType::DUMMYDEV);
 	
 	egddev->Who();
 	dummydev->Who();
@@ -25,9 +27,9 @@ int main(int argc, char** argv) {
 	}
 
 
-	egddev->eeg.dump();
-	egddev->exg.dump();
-	egddev->tri.dump();
+	frame.eeg.dump();
+	frame.exg.dump();
+	frame.tri.dump();
 	
 	std::cout<<"\n>>>>>>>>> TEST DUMMYDEV <<<<<<<<<<<<<<<"<<std::endl;
 	if(dummydev->Open("") == false)

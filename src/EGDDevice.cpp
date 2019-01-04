@@ -5,7 +5,7 @@
 
 namespace rosneuro {
 
-EGDDevice::EGDDevice(void) {
+EGDDevice::EGDDevice(NeuroFrame* frame) : Device(frame) {
 	
 	this->name_ = "egddev";
 
@@ -101,10 +101,10 @@ bool EGDDevice::Stop(void) {
 size_t EGDDevice::Get(void) {
 	size_t size;
 
-	size = egd_get_data(this->egddev_, this->eeg.nsamples(), 
-						(void*)this->eeg.data(), 
-						(void*)this->exg.data(), 
-						(void*)this->tri.data());
+	size = egd_get_data(this->egddev_, this->frame_->eeg.nsamples(), 
+						(void*)this->frame_->eeg.data(), 
+						(void*)this->frame_->exg.data(), 
+						(void*)this->frame_->tri.data());
 	if (size == -1) {
 		std::cerr<<"Error reading data: " << std::strerror(errno) << std::endl;
 	}
@@ -182,7 +182,7 @@ bool EGDDevice::setup_neuro_data(float hz) {
 		return false;
 	}
 	ns = (size_t)(float)sampling_rate/hz;
-	this->sampling_rate_ = sampling_rate;
+	this->frame_->sr = sampling_rate;
 
 	// Getting EEG number of channels
 	if( (neeg = egd_get_numch(this->egddev_, EGD_EEG)) == -1) {
@@ -203,14 +203,14 @@ bool EGDDevice::setup_neuro_data(float hz) {
 	}
 
 	// Setup NeuroData groups
-	this->eeg.reserve(ns, neeg);
-	this->exg.reserve(ns, nexg);
-	this->tri.reserve(ns, ntri);
+	this->frame_->eeg.reserve(ns, neeg);
+	this->frame_->exg.reserve(ns, nexg);
+	this->frame_->tri.reserve(ns, ntri);
 
 	// Fill NeuroData Info
-	this->setup_neuro_info(this->eeg.info(), this->eeg.nchannels(), EGD_EEG);
-	this->setup_neuro_info(this->exg.info(), this->exg.nchannels(), EGD_SENSOR);
-	this->setup_neuro_info(this->tri.info(), this->tri.nchannels(), EGD_TRIGGER);
+	this->setup_neuro_info(this->frame_->eeg.info(), this->frame_->eeg.nchannels(), EGD_EEG);
+	this->setup_neuro_info(this->frame_->exg.info(), this->frame_->exg.nchannels(), EGD_SENSOR);
+	this->setup_neuro_info(this->frame_->tri.info(), this->frame_->tri.nchannels(), EGD_TRIGGER);
 
 
 	return true;
@@ -256,25 +256,25 @@ bool EGDDevice::setup_egd_structures(void) {
 	this->grp_[0].iarray	 = 0;
 	this->grp_[0].datatype	 = EGD_FLOAT;
 	this->grp_[0].arr_offset = 0;
-	this->grp_[0].nch		 = this->eeg.nchannels();
+	this->grp_[0].nch		 = this->frame_->eeg.nchannels();
 	
 	this->grp_[1].sensortype = EGD_SENSOR;
 	this->grp_[1].index		 = 0; 
 	this->grp_[1].iarray	 = 1; 
 	this->grp_[1].datatype	 = EGD_FLOAT;
 	this->grp_[1].arr_offset = 0;
-	this->grp_[1].nch		 = this->exg.nchannels();
+	this->grp_[1].nch		 = this->frame_->exg.nchannels();
 	
 	this->grp_[2].sensortype = EGD_TRIGGER;
 	this->grp_[2].index		 = 0; 
 	this->grp_[2].iarray	 = 2;
 	this->grp_[2].datatype	 = EGD_INT32;
 	this->grp_[2].arr_offset = 0;
-	this->grp_[2].nch		 = this->tri.nchannels();
+	this->grp_[2].nch		 = this->frame_->tri.nchannels();
 
-	this->strides_[0] = this->eeg.stride();
-	this->strides_[1] = this->exg.stride();
-	this->strides_[2] = this->tri.stride();
+	this->strides_[0] = this->frame_->eeg.stride();
+	this->strides_[1] = this->frame_->exg.stride();
+	this->strides_[2] = this->frame_->tri.stride();
 
 	return true;
 }

@@ -17,7 +17,7 @@ bool Acquisition::configure(void) {
 
 	unsigned int devtype = DeviceType::EGDDEV;
 
-	this->dev_	   = factory_.createDevice(devtype);
+	this->dev_	   = factory_.createDevice(&this->frame_, devtype);
 	this->devname_ = this->dev_->GetName();
 
 
@@ -30,7 +30,7 @@ bool Acquisition::configure(void) {
 	ros::param::param("~reopen", this->reopen_, true);
 	ros::param::param("~autostart", this->autostart_, true);
 
-	this->pub_ = this->nh_.advertise<rosneuro_msgs::NeuroDataSet>(this->topic_, this->fs_);
+	this->pub_ = this->nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, this->fs_);
 	this->srv_start_ = this->p_nh_.advertiseService("start", &Acquisition::on_request_start, this);
 	this->srv_stop_  = this->p_nh_.advertiseService("stop",  &Acquisition::on_request_stop, this);
 	this->srv_quit_  = this->p_nh_.advertiseService("quit",  &Acquisition::on_request_quit, this);
@@ -67,19 +67,16 @@ bool Acquisition::Run(void) {
 	ROS_INFO("'%s' device correctly configured", this->devname_.c_str());
 
 	// Configure the message
-	if(NeuroDataTools::ConfigureMessage(this->dev_->eeg.info(), this->msg_.eeg.info) == false)
-		ROS_WARN("Cannot configure eeg info because group is not set. Skipping");
-	if(NeuroDataTools::ConfigureMessage(this->dev_->exg.info(), this->msg_.exg.info) == false)
-		ROS_WARN("Cannot configure exg info because group is not set. Skipping");
-	if(NeuroDataTools::ConfigureMessage(this->dev_->tri.info(), this->msg_.tri.info) == false)
-		ROS_WARN("Cannot configure tri info because group is not set. Skipping");
-		
-	ROS_INFO("NeuroData message correctly configured");
+	if(NeuroDataTools::ConfigureNeuroMessage(this->frame_, this->msg_) == false) {
+		ROS_WARN("Cannot configure NeuroFrame message");
+		return false;
+	}
+	ROS_INFO("NeuroFrame message correctly configured");
 
 	// Debug - Dump device configuration
-	this->dev_->eeg.dump();
-	this->dev_->exg.dump();
-	this->dev_->tri.dump();
+	this->frame_.eeg.dump();
+	this->frame_.exg.dump();
+	this->frame_.tri.dump();
 
 	ROS_INFO("Acquisition started");
 	while(this->nh_.ok() && quit == false) {
@@ -139,9 +136,7 @@ unsigned int Acquisition::on_device_started(void) {
 		return Acquisition::IS_DOWN;
 	} 
 		
-	if( NeuroDataTools::ToMessage(this->dev_->eeg, this->msg_.eeg) == true && 
-		NeuroDataTools::ToMessage(this->dev_->exg, this->msg_.exg) == true && 
-		NeuroDataTools::ToMessage(this->dev_->tri, this->msg_.tri) == true) {
+	if( NeuroDataTools::FromNeuroFrame(this->frame_, this->msg_) == true ) {
 		this->pub_.publish(this->msg_);
 	}
 
@@ -259,17 +254,8 @@ bool Acquisition::on_request_info(rosneuro_msgs::GetAcquisitionInfo::Request& re
 								  rosneuro_msgs::GetAcquisitionInfo::Response& res) {
 	
 	
-	// Configure info messages
-	NeuroDataTools::ConfigureMessage(this->dev_->eeg.info(), res.ieeg); 
-	NeuroDataTools::ConfigureMessage(this->dev_->exg.info(), res.iexg); 
-	NeuroDataTools::ConfigureMessage(this->dev_->tri.info(), res.itri); 
-	
-
-	res.samples      = this->dev_->eeg.nsamples();
-	res.eeg_channels = this->dev_->eeg.nchannels();
-	res.exg_channels = this->dev_->exg.nchannels();
-	res.tri_channels = this->dev_->tri.nchannels();
-	res.sampling_rate = this->dev_->GetSamplingRate();
+	//// Configure info messages
+	NeuroDataTools::ConfigureNeuroMessage(this->frame_, res.frame); 
 
 	res.device_model = this->dev_->devinfo.model;
 	res.device_id    = this->dev_->devinfo.id;
