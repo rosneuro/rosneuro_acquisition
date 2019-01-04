@@ -235,6 +235,8 @@ void EGDDevice::setup_neuro_info(NeuroDataInfo* info, size_t nch, unsigned int i
 	info->minmax[1]		= mm[1];
 	info->isint			= isint;
 
+	info->labels.clear();
+
 	for(auto i = 0; i<nch; i++) {
 		egd_channel_info(this->egddev_, index, i,
 						 EGD_LABEL, label, EGD_EOL);
