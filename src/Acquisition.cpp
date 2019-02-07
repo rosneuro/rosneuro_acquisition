@@ -43,7 +43,10 @@ bool Acquisition::configure(void) {
 bool Acquisition::Run(void) {
 
 	bool quit = false;
-	ros::Rate r(60);
+	
+	// Created by L.Tonin  <luca.tonin@epfl.ch> on 07/02/19 14:23:39
+	// Removed the sleep to not delay the acquisition
+	// //ros::Rate r(4096);
 	
 	// Configure acquisition
 	if(this->configure() == false) {
@@ -80,9 +83,12 @@ bool Acquisition::Run(void) {
 
 	ROS_INFO("Acquisition started");
 	while(this->nh_.ok() && quit == false) {
-		
+	
 		ros::spinOnce();
-		r.sleep();
+
+		// Created by L.Tonin  <luca.tonin@epfl.ch> on 07/02/19 14:23:01	
+		// Removed the sleep to not delay the acquisition
+		//r.sleep();
 
 		switch(this->state_) {
 			case Acquisition::IS_IDLE:
