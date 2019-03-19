@@ -70,8 +70,6 @@ bool EGDDevice::Open(const std::string& devname, int samplerate) {
 		}
 	}
 
-	printf("devname string: %s\n", devnamearg.c_str());
-	
 	//this->name_ = devname;
 
 	if(!(this->egddev_ = egd_open(devnamearg.c_str()))) {
