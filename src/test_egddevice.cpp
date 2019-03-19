@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
 	rosneuro::EGDDevice		egddev(&frame);
 
 
-	if(egddev.Open(argv[1]) == false)
+	if(egddev.Open(argv[1], -1) == false)
 		return -1;
 		
 	

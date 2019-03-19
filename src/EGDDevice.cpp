@@ -48,14 +48,29 @@ bool EGDDevice::Setup(float framerate) {
 	return true;
 }
 
-bool EGDDevice::Open(const std::string& devname) {
+bool EGDDevice::Open(const std::string& devname, int samplerate) {
 
 	std::string devnamearg;
-	if(devname.find(".bdf") != std::string::npos) 
+	bool isfile = false;
+
+	if(devname.find(".bdf") != std::string::npos) {
 		devnamearg.assign("datafile|path|");
-	else if(devname.find(".gdf") != std::string::npos) 
+		isfile = true;
+	} else if(devname.find(".gdf") != std::string::npos) {
 		devnamearg.assign("datafile|path|");
+		isfile = true;
+	}
 	devnamearg.append(devname);
+
+	if(isfile == false && samplerate > 0) {
+		if(devname.compare("gtec") == 0) {
+			devnamearg += "|samplerate|" + std::to_string(samplerate);
+		} else if(devname.compare("eego") == 0) {
+			devnamearg += "|SR|" + std::to_string(samplerate);
+		}
+	}
+
+	printf("devname string: %s\n", devnamearg.c_str());
 	
 	//this->name_ = devname;
 

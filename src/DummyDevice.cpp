@@ -15,7 +15,7 @@ bool DummyDevice::Setup(float framerate) {
 	return true;
 }
 
-bool DummyDevice::Open(const std::string& devname) {
+bool DummyDevice::Open(const std::string& devname, int samplerate) {
 	printf("[%s] - Device open\n", this->name_.c_str());
 	return true;
 }

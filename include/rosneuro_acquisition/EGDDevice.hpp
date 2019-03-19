@@ -21,7 +21,7 @@ class EGDDevice : public Device {
 		virtual ~EGDDevice(void);
 
 		bool Setup(float framerate);
-		bool Open(const std::string& devname);
+		bool Open(const std::string& devname, int samplerate);
 		bool Close(void);
 		bool Start(void);
 		bool Stop(void);
@@ -33,7 +33,7 @@ class EGDDevice : public Device {
 		void init_egd_structures(void);
 
 		bool setup_dev_capabilities(void);
-		bool setup_neuro_data(float hz);
+		bool setup_neuro_data(float framerate);
 		void setup_neuro_info(NeuroDataInfo* data, size_t nch, unsigned int index);
 		bool setup_egd_structures(void);
 		

@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 	dummydev->Who();
 
 	std::cout<<"\n>>>>>>>>> TEST EGDDEV <<<<<<<<<<<<<<<"<<std::endl;
-	if(egddev->Open(argv[1]) == false)
+	if(egddev->Open(argv[1], 512) == false)
 		return -1;
 		
 	
@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 	frame.tri.dump();
 	
 	std::cout<<"\n>>>>>>>>> TEST DUMMYDEV <<<<<<<<<<<<<<<"<<std::endl;
-	if(dummydev->Open("") == false)
+	if(dummydev->Open("", 512) == false)
 		return -1;
 		
 	

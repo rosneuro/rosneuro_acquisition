@@ -26,6 +26,7 @@ bool Acquisition::configure(void) {
 		return false;
 	}
 	
+	ros::param::param("~samplerate", this->samplerate_, -1);
 	ros::param::param("~framerate", this->framerate_, 16.0f);
 	ros::param::param("~reopen", this->reopen_, true);
 	ros::param::param("~autostart", this->autostart_, true);
@@ -60,11 +61,11 @@ bool Acquisition::Run(void) {
 	ROS_INFO("Acquisition correctly configured");
 
 	// Open the device
-	if(this->dev_->Open(this->devarg_) == false) {
-		ROS_ERROR("Cannot open the '%s' device with arg=%s", this->devname_.c_str(), this->devarg_.c_str());
+	if(this->dev_->Open(this->devarg_, this->samplerate_) == false) {
+		ROS_ERROR("Cannot open the '%s' device with arg=%s and samplerate=%d Hz", this->devname_.c_str(), this->devarg_.c_str(), this->samplerate_);
 		return false;
 	}
-	ROS_INFO("'%s' device correctly opened with arg=%s", this->devname_.c_str(), this->devarg_.c_str());
+	ROS_INFO("'%s' device correctly opened with arg=%s and samplerate=%d Hz", this->devname_.c_str(), this->devarg_.c_str(), this->samplerate_);
 
 	// Configure device
 	if(this->dev_->Setup(this->framerate_) == false) {
@@ -175,11 +176,11 @@ unsigned int Acquisition::on_device_down(void) {
 	this->dev_->Close();
 
 	// Re-opening the device
-	if(this->dev_->Open(this->devarg_) == false) {
-		ROS_ERROR("Cannot re-open the '%s' device with arg=%s", this->devname_.c_str(), this->devarg_.c_str());
+	if(this->dev_->Open(this->devarg_, this->samplerate_) == false) {
+		ROS_ERROR("Cannot re-open the '%s' device with arg=%s and samplerate=%d Hz", this->devname_.c_str(), this->devarg_.c_str(), this->samplerate_);
 		return Acquisition::IS_QUIT;
 	}
-	ROS_INFO("'%s' device correctly re-opened with arg=%s", this->devname_.c_str(), this->devarg_.c_str());
+	ROS_INFO("'%s' device correctly re-opened with arg=%s and samplerate=%d Hz", this->devname_.c_str(), this->devarg_.c_str(), this->samplerate_);
 
 	// Re-configuring device
 	if(this->dev_->Setup(this->framerate_) == false) {

@@ -17,7 +17,7 @@ class DummyDevice : public Device {
 		virtual ~DummyDevice(void);
 
 		bool Setup(float framerate);
-		bool Open(const std::string& devname);
+		bool Open(const std::string& devname, int samplerate);
 		bool Close(void);
 		bool Start(void);
 		bool Stop(void);

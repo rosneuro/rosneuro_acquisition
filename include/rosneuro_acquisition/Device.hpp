@@ -20,7 +20,7 @@ class Device {
 		virtual ~Device(void);
 
 		virtual bool   Setup(float framerate) = 0;
-		virtual bool   Open(const std::string& devname) = 0;
+		virtual bool   Open(const std::string& devname, int samplerate) = 0;
 		virtual bool   Close(void)	= 0;
 		virtual bool   Start(void)	= 0;
 		virtual bool   Stop(void)	= 0;

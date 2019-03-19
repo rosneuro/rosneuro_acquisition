@@ -59,6 +59,7 @@ class Acquisition {
 		std::string		devarg_;
 		std::string		devname_;
 		float			framerate_;
+		int				samplerate_;
 		bool			reopen_;
 		bool			autostart_;
 		
