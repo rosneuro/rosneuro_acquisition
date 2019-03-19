@@ -20,7 +20,7 @@ class EGDDevice : public Device {
 		EGDDevice(NeuroFrame* frame);
 		virtual ~EGDDevice(void);
 
-		bool Setup(float fs);
+		bool Setup(float framerate);
 		bool Open(const std::string& devname);
 		bool Close(void);
 		bool Start(void);

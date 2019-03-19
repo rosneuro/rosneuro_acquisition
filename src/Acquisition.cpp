@@ -26,14 +26,14 @@ bool Acquisition::configure(void) {
 		return false;
 	}
 	
-	ros::param::param("~fs", this->fs_, 16.0f);
+	ros::param::param("~framerate", this->framerate_, 16.0f);
 	ros::param::param("~reopen", this->reopen_, true);
 	ros::param::param("~autostart", this->autostart_, true);
 	
 	// Created by L.Tonin  <luca.tonin@epfl.ch> on 17/03/19 15:39:15
 	// Using just 1 queue size
-	this->pub_ = this->nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, 1);
-	//this->pub_ = this->nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, this->fs_);
+	this->pub_ = this->p_nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, 1);
+	//this->pub_ = this->nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, this->framerate_);
 	
 	this->srv_start_ = this->p_nh_.advertiseService("start", &Acquisition::on_request_start, this);
 	this->srv_stop_  = this->p_nh_.advertiseService("stop",  &Acquisition::on_request_stop, this);
@@ -67,7 +67,7 @@ bool Acquisition::Run(void) {
 	ROS_INFO("'%s' device correctly opened with arg=%s", this->devname_.c_str(), this->devarg_.c_str());
 
 	// Configure device
-	if(this->dev_->Setup(this->fs_) == false) {
+	if(this->dev_->Setup(this->framerate_) == false) {
 		ROS_ERROR("Cannot setup the '%s' device", this->devname_.c_str());
 		return false;
 	}
@@ -182,7 +182,7 @@ unsigned int Acquisition::on_device_down(void) {
 	ROS_INFO("'%s' device correctly re-opened with arg=%s", this->devname_.c_str(), this->devarg_.c_str());
 
 	// Re-configuring device
-	if(this->dev_->Setup(this->fs_) == false) {
+	if(this->dev_->Setup(this->framerate_) == false) {
 		ROS_ERROR("Cannot re-setup the '%s' device", this->devname_.c_str());
 		return Acquisition::IS_QUIT;
 	}

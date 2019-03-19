@@ -19,7 +19,7 @@ class Device {
 		Device(NeuroFrame* frame);
 		virtual ~Device(void);
 
-		virtual bool   Setup(float fs) = 0;
+		virtual bool   Setup(float framerate) = 0;
 		virtual bool   Open(const std::string& devname) = 0;
 		virtual bool   Close(void)	= 0;
 		virtual bool   Start(void)	= 0;

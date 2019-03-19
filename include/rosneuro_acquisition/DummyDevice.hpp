@@ -16,7 +16,7 @@ class DummyDevice : public Device {
 		DummyDevice(NeuroFrame* frame);
 		virtual ~DummyDevice(void);
 
-		bool Setup(float fs);
+		bool Setup(float framerate);
 		bool Open(const std::string& devname);
 		bool Close(void);
 		bool Start(void);

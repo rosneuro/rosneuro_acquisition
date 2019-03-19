@@ -10,7 +10,7 @@ DummyDevice::DummyDevice(NeuroFrame* frame) : Device(frame) {
 }
 DummyDevice::~DummyDevice(void) {}
 
-bool DummyDevice::Setup(float fs) {
+bool DummyDevice::Setup(float framerate) {
 	printf("[%s] - Setup done\n", this->name_.c_str());
 	return true;
 }

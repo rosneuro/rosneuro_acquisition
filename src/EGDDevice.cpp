@@ -18,7 +18,7 @@ EGDDevice::~EGDDevice(void) {
 	this->destroy_egd_structures();
 }
 
-bool EGDDevice::Setup(float hz) {
+bool EGDDevice::Setup(float framerate) {
 
 	
 	// Setup structures
@@ -28,7 +28,7 @@ bool EGDDevice::Setup(float hz) {
 	}
 	
 	
-	if(this->setup_neuro_data(hz) == false) {
+	if(this->setup_neuro_data(framerate) == false) {
 		std::cerr<<"[Error] - Cannot setup data"<<std::endl; 
 		return false;
 	}
@@ -169,7 +169,7 @@ bool EGDDevice::setup_dev_capabilities(void) {
 	return true;
 }
 
-bool EGDDevice::setup_neuro_data(float hz) {
+bool EGDDevice::setup_neuro_data(float framerate) {
 
 	size_t ns;
 	size_t neeg, nexg, ntri;
@@ -181,7 +181,7 @@ bool EGDDevice::setup_neuro_data(float hz) {
 		std::cerr<<"[Error] - Cannot get device sampling rate: "<<strerror(errno)<<std::endl;
 		return false;
 	}
-	ns = (size_t)(float)sampling_rate/hz;
+	ns = (size_t)(float)sampling_rate/framerate;
 	this->frame_->sr = sampling_rate;
 
 	// Getting EEG number of channels
