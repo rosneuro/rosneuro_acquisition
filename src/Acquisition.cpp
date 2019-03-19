@@ -29,8 +29,12 @@ bool Acquisition::configure(void) {
 	ros::param::param("~fs", this->fs_, 16.0f);
 	ros::param::param("~reopen", this->reopen_, true);
 	ros::param::param("~autostart", this->autostart_, true);
-
-	this->pub_ = this->nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, this->fs_);
+	
+	// Created by L.Tonin  <luca.tonin@epfl.ch> on 17/03/19 15:39:15
+	// Using just 1 queue size
+	this->pub_ = this->nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, 1);
+	//this->pub_ = this->nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, this->fs_);
+	
 	this->srv_start_ = this->p_nh_.advertiseService("start", &Acquisition::on_request_start, this);
 	this->srv_stop_  = this->p_nh_.advertiseService("stop",  &Acquisition::on_request_stop, this);
 	this->srv_quit_  = this->p_nh_.advertiseService("quit",  &Acquisition::on_request_quit, this);
@@ -135,9 +139,12 @@ unsigned int Acquisition::on_device_started(void) {
 	size_t gsize = -1;
 	size_t asize = -1;
 
+
 	gsize = this->dev_->Get();
 	asize = this->dev_->GetAvailable();
 
+	this->msg_.header.stamp = ros::Time::now();
+	
 	if(gsize == (size_t)-1) {
 		return Acquisition::IS_DOWN;
 	} 
@@ -147,7 +154,7 @@ unsigned int Acquisition::on_device_started(void) {
 	}
 
 	if(asize > 0)
-		ROS_WARN("'%s' device running late: Get/Available=%zd/%zd", this->devname_.c_str(), gsize, asize);
+		//ROS_WARN("'%s' device running late: Get/Available=%zd/%zd", this->devname_.c_str(), gsize, asize);
 		
 	return Acquisition::IS_STARTED;
 }
