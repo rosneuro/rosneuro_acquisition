@@ -51,7 +51,7 @@ class Acquisition {
 
 		/*! \brief      Run the acquisition
 		 *
-		 * The function opens and configures the device, configure the Neuroframe message
+		 * The function opens and configures the device, configures the Neuroframe message
 		 * and runs the finite state machine.
 		 *
 		 * \return     True if the acquisition is closed on request without errors, false otherwise.
