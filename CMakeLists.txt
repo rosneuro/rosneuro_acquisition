@@ -74,4 +74,7 @@ target_link_libraries(test_devicefactory rosneuro_acquisition)
 add_executable(test_egddevice src/test_egddevice.cpp)
 target_link_libraries(test_egddevice rosneuro_acquisition)
 
+add_executable(test_regexp src/test_regexp.cpp)
+target_link_libraries(test_regexp rosneuro_acquisition)
+
 

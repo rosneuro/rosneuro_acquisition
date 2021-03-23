@@ -26,7 +26,11 @@ bool Acquisition::configure(void) {
 		return false;
 	}
 	
-	ros::param::param("~samplerate", this->samplerate_, -1);
+	if(ros::param::get("~samplerate", this->samplerate_) == false) {
+		ROS_ERROR("Missing 'samplerate' in the server. 'samplerate' is a mandatory parameter");
+		return false;
+	}
+	
 	ros::param::param("~framerate", this->framerate_, 16.0f);
 	ros::param::param("~reopen", this->reopen_, true);
 	ros::param::param("~autostart", this->autostart_, true);
@@ -73,6 +77,9 @@ bool Acquisition::Run(void) {
 		return false;
 	}
 	ROS_INFO("'%s' device correctly configured", this->devname_.c_str());
+
+	// Store samplerate in the frame
+	this->frame_.sr = this->samplerate_;
 
 	// Configure the message
 	if(NeuroDataTools::ConfigureNeuroMessage(this->frame_, this->msg_) == false) {
