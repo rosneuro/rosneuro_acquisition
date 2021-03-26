@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <std_srvs/Empty.h>
 #include "rosneuro_acquisition/FactoryDevice.hpp"
+#include "rosneuro_acquisition/Device.hpp"
 #include "rosneuro_data/NeuroData.hpp"
 #include "rosneuro_data/NeuroDataTools.hpp"
 #include "rosneuro_msgs/NeuroFrame.h"
@@ -146,8 +147,7 @@ class Acquisition {
 		unsigned int		state_;
 
 
-		FactoryDevice	factory_;
-		std::unique_ptr<Device>	dev_;
+		Device*			dev_;
 
 		std::string		devarg_;
 		std::string		devname_;

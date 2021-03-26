@@ -11,29 +11,27 @@ Acquisition::Acquisition(void) : p_nh_("~") {
 	this->state_	 = Acquisition::IS_IDLE;
 }
 
-Acquisition::~Acquisition(void) {}
+Acquisition::~Acquisition(void) {
+	delete this->dev_;
+}
 
 bool Acquisition::configure(void) {
 
 	unsigned int devtypeId;
 	std::string  devtype;
 	
-	ros::param::param<std::string>("~devtype", devtype, "default"); 
+	ros::param::param<std::string>("~devtype", devtype, "LSLDevice"); 
 	
-	if( devtype.compare("egddev") == 0) {
-		devtypeId = DeviceType::EGDDEV;
-	} else if(devtype.compare("lsldev") == 0) {
-		devtypeId = DeviceType::LSLDEV;
-	} else if(devtype.compare("default") == 0) {
-		devtypeId = DeviceType::LSLDEV;
-	} else {
-		ROS_ERROR("Unknown devtype: '%s'", devtype.c_str());
+	this->dev_	   = FactoryDevice::get().createDevice(devtype);
+	
+	if(this->dev_ == nullptr) {
+		ROS_ERROR("Unknown device type: %s", devtype.c_str());
 		return false;
 	}
 
-	this->dev_	   = factory_.createDevice(&this->frame_, devtypeId);
 	this->devname_ = this->dev_->GetName();
-
+	this->dev_->SetNeuroFrame(&this->frame_);
+	ROS_INFO("Acquisition correctly created the device: %s", this->devname_.c_str());
 
 	if(ros::param::get("~devarg", this->devarg_) == false) {
 		ROS_ERROR("Missing 'devarg' in the server. 'devarg' is a mandatory parameter");
@@ -50,10 +48,7 @@ bool Acquisition::configure(void) {
 	ros::param::param("~reopen", this->reopen_, true);
 	ros::param::param("~autostart", this->autostart_, true);
 	
-	// Created by L.Tonin  <luca.tonin@epfl.ch> on 17/03/19 15:39:15
-	// Using just 1 queue size
 	this->pub_ = this->p_nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, 1);
-	//this->pub_ = this->nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, this->framerate_);
 	
 	this->srv_start_ = this->p_nh_.advertiseService("start", &Acquisition::on_request_start, this);
 	this->srv_stop_  = this->p_nh_.advertiseService("stop",  &Acquisition::on_request_stop, this);

@@ -5,26 +5,23 @@
 
 namespace rosneuro {
 
-std::unique_ptr<Device> FactoryDevice::createDevice(NeuroFrame* frame, unsigned int type) {
+FactoryDevice& FactoryDevice::get() {
+	static FactoryDevice instance;
+	return instance;
+}
 
-	std::unique_ptr<Device> dev;
-	switch(type) {
-		case DeviceType::EGDDEV:
-			dev = std::unique_ptr<EGDDevice>(new EGDDevice(frame));
-			break;
-		case DeviceType::LSLDEV:
-			dev = std::unique_ptr<LSLDevice>(new LSLDevice(frame));
-			break;
-		case DeviceType::DUMMYDEV:
-			dev = std::unique_ptr<DummyDevice>(new DummyDevice(frame));
-			break;
-		default:
-			printf("[FactoryDevice] - Unknown device type required: %u\n", type);
-			dev = std::unique_ptr<Device>(nullptr);
-			break;
-	}
+bool FactoryDevice::Register(const std::string name, const InstanceCreator& funcCreate) {
+	return this->m_devices_.insert(std::make_pair(name, funcCreate)).second;
+}
 
-	return dev;
+Device* FactoryDevice::createDevice(const std::string& name) {
+	auto it = this->m_devices_.find(name);
+
+    if (it != this->m_devices_.end()) {
+        return it->second();
+    }
+ 
+    return nullptr;
 }
 
 

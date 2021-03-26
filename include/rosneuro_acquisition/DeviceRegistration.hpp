@@ -1,7 +1,7 @@
 #ifndef ROSNEURO_DEVICE_REGISTRATION_HPP
 #define ROSNEURO_DEVICE_REGISTRATION_HPP
 
-#include "rosneuro_acquisition/SelfFactoryDevice.hpp"
+#include "rosneuro_acquisition/FactoryDevice.hpp"
 
 namespace rosneuro {
 
@@ -10,7 +10,7 @@ namespace rosneuro {
 
 		public:
 			DeviceRegistration(std::string name) {
-				SelfFactoryDevice::get().Register(name, []() {
+				FactoryDevice::get().Register(name, []() {
 						return static_cast<Device*>(new T()); }
 						);
 			}

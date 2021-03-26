@@ -18,9 +18,6 @@ find_path(EEGDEV_INCLUDE_DIRS eegdev.h)
 find_library(LSL_LIBRARIES lsl64)
 find_path(LSL_INCLUDE_DIRS lsl_cpp.h)
 
-message(STATUS "Found LSL libraries in ${LSL_LIBRARIES}")
-message(STATUS "Found LSL headers in ${LSL_INCLUDE_DIRS}")
-
 catkin_package(
   INCLUDE_DIRS 
 	include
@@ -35,38 +32,49 @@ catkin_package(
   DEPENDS
 )
 
+
 ###########
 ## Build ##
 ###########
 
-include_directories(${catkin_INCLUDE_DIRS} 
-					${EEGDEV_INCLUDE_DIRS}
-					${LSL_INCLUDE_DIRS}
-					include
-)
+set(LIB_INCLUDE_DIRS ${catkin_INCLUDE_DIRS})
 
-add_library(${PROJECT_NAME}
+set(LIB_SOURCES 
 	src/Device.cpp
-	src/EGDDevice.cpp
 	src/DummyDevice.cpp
-	#src/FactoryDevice.cpp
-	#src/Acquisition.cpp
-	src/LSLDevice.cpp
-	src/SelfFactoryDevice.cpp
+	src/Acquisition.cpp
+	src/FactoryDevice.cpp
 	src/DeviceRegistration.cpp
-	#src/NeuroDataTools.cpp
-	#src/Writer.cpp
-	#src/XDFWriter.cpp
-	#src/DummyWriter.cpp
-	#src/FactoryWriter.cpp
-			#src/Recorder.cpp
-)
+	)
 
-target_link_libraries(${PROJECT_NAME} 
-					  ${catkin_LIBRARIES} 
-					  ${EEGDEV_LIBRARIES}
-					  ${LSL_LIBRARIES}
-)
+set(LIB_TARGET ${catkin_LIBRARIES})
+
+if(EEGDEV_LIBRARIES AND EEGDEV_INCLUDE_DIRS)
+	set(LIB_INCLUDE_DIRS ${LIB_INCLUDE_DIRS} ${EEGDEV_INCLUDE_DIRS})
+	set(LIB_SOURCES ${LIB_SOURCES} src/EGDDevice.cpp)
+	set(LIB_TARGET ${LIB_TARGET} ${EEGDEV_LIBRARIES})
+	message(STATUS "Found EEGDEV libraries in ${EEGDEV_LIBRARIES}")
+	message(STATUS "Found EEGDEV headers in ${EEGDEV_INCLUDE_DIRS}")
+else()
+	message(WARNING "EEGDEV libraries not found. Functionalities will not be included")
+endif()
+
+if(LSL_LIBRARIES AND LSL_INCLUDE_DIRS)
+	set(LIB_INCLUDE_DIRS ${LIB_INCLUDE_DIRS} ${LSL_INCLUDE_DIRS})
+	set(LIB_SOURCES ${LIB_SOURCES} src/LSLDevice.cpp)
+	set(LIB_TARGET ${LIB_TARGET} ${LSL_LIBRARIES})
+	message(STATUS "Found LSL libraries in ${LSL_LIBRARIES}")
+	message(STATUS "Found LSL headers in ${LSL_INCLUDE_DIRS}")
+else()
+	message(WARNING "LSL libraries not found. Functionalities will not be included")
+endif()
+
+
+include_directories(${LIB_INCLUDE_DIRS} include)
+
+add_library(${PROJECT_NAME} ${LIB_SOURCES})
+
+target_link_libraries(${PROJECT_NAME} ${LIB_TARGET})
 
 add_dependencies(${PROJECT_NAME} 
 				 ${catkin_EXPORTED_TARGETS}
@@ -75,22 +83,18 @@ add_dependencies(${PROJECT_NAME}
 #################
 ## Executables ##
 #################
-#add_executable(acquisition src/acquisition.cpp)
-#target_link_libraries(acquisition rosneuro_acquisition)
+add_executable(acquisition src/acquisition.cpp)
+target_link_libraries(acquisition rosneuro_acquisition)
 
-#add_executable(test_devicefactory src/test_devicefactory.cpp)
-#target_link_libraries(test_devicefactory rosneuro_acquisition)
+add_executable(test_factory src/test_factory.cpp)
+target_link_libraries(test_factory rosneuro_acquisition)
 
-#add_executable(test_egddevice src/test_egddevice.cpp)
-#target_link_libraries(test_egddevice rosneuro_acquisition)
+if(LSL_LIBRARIES AND LSL_INCLUDE_DIRS)
+	add_executable(lslclient src/lslclient.cpp)
+	target_link_libraries(lslclient rosneuro_acquisition)
+endif()
 
-
-add_executable(test_selffactory src/test_selffactory.cpp)
-target_link_libraries(test_selffactory rosneuro_acquisition)
-
-add_executable(test_regexp src/test_regexp.cpp)
-target_link_libraries(test_regexp rosneuro_acquisition)
-
-add_executable(lslclient src/lslclient.cpp)
-target_link_libraries(lslclient rosneuro_acquisition)
-
+if(EEGDEV_LIBRARIES AND EEGDEV_INCLUDE_DIRS)
+	add_executable(test_egddevice src/test_egddevice.cpp)
+	target_link_libraries(test_egddevice rosneuro_acquisition)
+endif()
