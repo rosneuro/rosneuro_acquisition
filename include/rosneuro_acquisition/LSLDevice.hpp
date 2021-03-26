@@ -10,12 +10,14 @@
 #include <lsl_cpp.h>
 #include "rosneuro_data/NeuroData.hpp"
 #include "rosneuro_acquisition/Device.hpp"
+#include "rosneuro_acquisition/DeviceRegistration.hpp"
 
 namespace rosneuro {
 
 class LSLDevice : public Device {
 
 	public:
+		LSLDevice(void);
 		LSLDevice(NeuroFrame* frame);
 		virtual ~LSLDevice(void);
 
@@ -41,6 +43,7 @@ class LSLDevice : public Device {
 };
 
 
+DeviceRegistration<LSLDevice> _LSLDevice("LSLDevice");
 
 }
 

@@ -34,9 +34,13 @@ class Device {
 		 */
 		Device(NeuroFrame* frame);
 
+		Device(void);
+
 		/*! \brief      Destructor
 		 */
 		virtual ~Device(void);
+
+		void SetNeuroFrame(NeuroFrame* frame);
 
 		/*! \brief      Set up the device
 		 *

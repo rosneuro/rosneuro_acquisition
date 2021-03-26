@@ -8,6 +8,7 @@
 #include <eegdev.h>
 #include "rosneuro_data/NeuroData.hpp"
 #include "rosneuro_acquisition/Device.hpp"
+#include "rosneuro_acquisition/DeviceRegistration.hpp"
 
 #define EGD_DATA_GROUPS 3
 
@@ -32,6 +33,8 @@ class EGDDevice : public Device {
 		 * 
 		 */
 		EGDDevice(NeuroFrame* frame);
+
+		EGDDevice(void);
 
 		/*! \brief      Destructor
 		 */
@@ -131,6 +134,9 @@ class EGDDevice : public Device {
 		struct	grpconf* grp_;
 		size_t* strides_;
 };
+
+
+DeviceRegistration<EGDDevice> _EGDDevice("EGDDevice");
 
  /*! \example test_egddevice.cpp
  * Example of the use of the EDG device and how to set up the framerate.

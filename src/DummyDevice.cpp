@@ -8,6 +8,11 @@ namespace rosneuro {
 DummyDevice::DummyDevice(NeuroFrame* frame) : Device(frame) {
 	this->name_ = "dummy";
 }
+
+DummyDevice::DummyDevice(void) : Device() {
+	this->name_ = "dummy";
+}
+
 DummyDevice::~DummyDevice(void) {}
 
 bool DummyDevice::Setup(float framerate) {

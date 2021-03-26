@@ -5,12 +5,21 @@
 
 namespace rosneuro {
 
+Device::Device(void) {
+	this->name_  = "undefined";
+	this->frame_ = nullptr;
+}
+
 Device::Device(NeuroFrame* frame)  {
 	this->name_	 = "undefined";
 	this->frame_ = frame;
 }
 
 Device::~Device(void) {}
+
+void Device::SetNeuroFrame(NeuroFrame* frame) {
+	this->frame_ = frame;
+}
 
 std::string Device::GetName(void) {
 	return this->name_;

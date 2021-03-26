@@ -5,6 +5,15 @@
 
 namespace rosneuro {
 
+LSLDevice::LSLDevice(void) : Device() {
+	this->name_ = "lsldev";
+	this->stream_ = nullptr;
+	this->info_   = nullptr;
+	
+	this->stream_name_ = "unknown";
+	this->stream_type_ = "unknown";
+}
+
 LSLDevice::LSLDevice(NeuroFrame* frame) : Device(frame) {
 	
 	this->name_ = "lsldev";

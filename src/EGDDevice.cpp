@@ -5,6 +5,13 @@
 
 namespace rosneuro {
 
+EGDDevice::EGDDevice(void) : Device() {
+	this->name_ = "egddev";
+
+	this->grp_	   = nullptr;
+	this->strides_ = nullptr;
+}
+
 EGDDevice::EGDDevice(NeuroFrame* frame) : Device(frame) {
 	
 	this->name_ = "egddev";

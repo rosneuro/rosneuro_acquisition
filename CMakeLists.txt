@@ -49,9 +49,11 @@ add_library(${PROJECT_NAME}
 	src/Device.cpp
 	src/EGDDevice.cpp
 	src/DummyDevice.cpp
-	src/FactoryDevice.cpp
-	src/Acquisition.cpp
+	#src/FactoryDevice.cpp
+	#src/Acquisition.cpp
 	src/LSLDevice.cpp
+	src/SelfFactoryDevice.cpp
+	src/DeviceRegistration.cpp
 	#src/NeuroDataTools.cpp
 	#src/Writer.cpp
 	#src/XDFWriter.cpp
@@ -73,14 +75,18 @@ add_dependencies(${PROJECT_NAME}
 #################
 ## Executables ##
 #################
-add_executable(acquisition src/acquisition.cpp)
-target_link_libraries(acquisition rosneuro_acquisition)
+#add_executable(acquisition src/acquisition.cpp)
+#target_link_libraries(acquisition rosneuro_acquisition)
 
-add_executable(test_devicefactory src/test_devicefactory.cpp)
-target_link_libraries(test_devicefactory rosneuro_acquisition)
+#add_executable(test_devicefactory src/test_devicefactory.cpp)
+#target_link_libraries(test_devicefactory rosneuro_acquisition)
 
-add_executable(test_egddevice src/test_egddevice.cpp)
-target_link_libraries(test_egddevice rosneuro_acquisition)
+#add_executable(test_egddevice src/test_egddevice.cpp)
+#target_link_libraries(test_egddevice rosneuro_acquisition)
+
+
+add_executable(test_selffactory src/test_selffactory.cpp)
+target_link_libraries(test_selffactory rosneuro_acquisition)
 
 add_executable(test_regexp src/test_regexp.cpp)
 target_link_libraries(test_regexp rosneuro_acquisition)

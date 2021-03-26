@@ -1,14 +1,17 @@
 #ifndef ROSNEURO_ACQUISITION_DUMMYDEVICE_HPP
 #define ROSNEURO_ACQUISITION_DUMMYDEVICE_HPP
 
+#include <memory>
 #include <errno.h>
 #include <string.h>
 #include "rosneuro_acquisition/Device.hpp"
+#include "rosneuro_acquisition/DeviceRegistration.hpp"
 
 // Created by L.Tonin  <luca.tonin@epfl.ch> on 06/12/18 16:22:48
 // Dummy device to test the device factory
 
 namespace rosneuro {
+
 
 /*! \brief      Dummy device class
  * 
@@ -27,6 +30,8 @@ class DummyDevice : public Device {
 		 * 
 		 */
 		DummyDevice(NeuroFrame* frame);
+
+		DummyDevice(void);
 
 		/*! \brief      Destructor
 		 */
@@ -79,7 +84,10 @@ class DummyDevice : public Device {
 		 */
 		size_t GetAvailable(void);
 
+
 };
+
+DeviceRegistration<DummyDevice> _DummyDevice("DummyDevice");
 
 }
 
