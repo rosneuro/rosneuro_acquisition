@@ -15,9 +15,23 @@ Acquisition::~Acquisition(void) {}
 
 bool Acquisition::configure(void) {
 
-	unsigned int devtype = DeviceType::EGDDEV;
+	unsigned int devtypeId;
+	std::string  devtype;
+	
+	ros::param::param<std::string>("~devtype", devtype, "default"); 
+	
+	if( devtype.compare("egddev") == 0) {
+		devtypeId = DeviceType::EGDDEV;
+	} else if(devtype.compare("lsldev") == 0) {
+		devtypeId = DeviceType::LSLDEV;
+	} else if(devtype.compare("default") == 0) {
+		devtypeId = DeviceType::LSLDEV;
+	} else {
+		ROS_ERROR("Unknown devtype: '%s'", devtype.c_str());
+		return false;
+	}
 
-	this->dev_	   = factory_.createDevice(&this->frame_, devtype);
+	this->dev_	   = factory_.createDevice(&this->frame_, devtypeId);
 	this->devname_ = this->dev_->GetName();
 
 
@@ -25,6 +39,7 @@ bool Acquisition::configure(void) {
 		ROS_ERROR("Missing 'devarg' in the server. 'devarg' is a mandatory parameter");
 		return false;
 	}
+
 	
 	if(ros::param::get("~samplerate", this->samplerate_) == false) {
 		ROS_ERROR("Missing 'samplerate' in the server. 'samplerate' is a mandatory parameter");

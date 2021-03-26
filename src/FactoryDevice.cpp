@@ -12,6 +12,9 @@ std::unique_ptr<Device> FactoryDevice::createDevice(NeuroFrame* frame, unsigned 
 		case DeviceType::EGDDEV:
 			dev = std::unique_ptr<EGDDevice>(new EGDDevice(frame));
 			break;
+		case DeviceType::LSLDEV:
+			dev = std::unique_ptr<LSLDevice>(new LSLDevice(frame));
+			break;
 		case DeviceType::DUMMYDEV:
 			dev = std::unique_ptr<DummyDevice>(new DummyDevice(frame));
 			break;

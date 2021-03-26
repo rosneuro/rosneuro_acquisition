@@ -4,6 +4,7 @@
 #include <memory>
 #include "rosneuro_acquisition/Device.hpp"
 #include "rosneuro_acquisition/EGDDevice.hpp"
+#include "rosneuro_acquisition/LSLDevice.hpp"
 #include "rosneuro_acquisition/DummyDevice.hpp"
 
 namespace rosneuro {
@@ -13,7 +14,7 @@ namespace rosneuro {
  * The enum contains the list of the devices for which the plugin is currently implemented
  * 
  */
-enum DeviceType {EGDDEV, DUMMYDEV};
+enum DeviceType {EGDDEV, LSLDEV, DUMMYDEV};
 
 
 /*! \brief      Factory device class

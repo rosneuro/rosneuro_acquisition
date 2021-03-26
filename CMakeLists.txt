@@ -15,6 +15,11 @@ SET(CMAKE_BUILD_TYPE RelWithDebInfo)
 find_library(EEGDEV_LIBRARIES eegdev)
 find_path(EEGDEV_INCLUDE_DIRS eegdev.h)
 
+find_library(LSL_LIBRARIES lsl64)
+find_path(LSL_INCLUDE_DIRS lsl_cpp.h)
+
+message(STATUS "Found LSL libraries in ${LSL_LIBRARIES}")
+message(STATUS "Found LSL headers in ${LSL_INCLUDE_DIRS}")
 
 catkin_package(
   INCLUDE_DIRS 
@@ -36,6 +41,7 @@ catkin_package(
 
 include_directories(${catkin_INCLUDE_DIRS} 
 					${EEGDEV_INCLUDE_DIRS}
+					${LSL_INCLUDE_DIRS}
 					include
 )
 
@@ -45,6 +51,7 @@ add_library(${PROJECT_NAME}
 	src/DummyDevice.cpp
 	src/FactoryDevice.cpp
 	src/Acquisition.cpp
+	src/LSLDevice.cpp
 	#src/NeuroDataTools.cpp
 	#src/Writer.cpp
 	#src/XDFWriter.cpp
@@ -56,6 +63,7 @@ add_library(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} 
 					  ${catkin_LIBRARIES} 
 					  ${EEGDEV_LIBRARIES}
+					  ${LSL_LIBRARIES}
 )
 
 add_dependencies(${PROJECT_NAME} 
@@ -77,4 +85,6 @@ target_link_libraries(test_egddevice rosneuro_acquisition)
 add_executable(test_regexp src/test_regexp.cpp)
 target_link_libraries(test_regexp rosneuro_acquisition)
 
+add_executable(lslclient src/lslclient.cpp)
+target_link_libraries(lslclient rosneuro_acquisition)
 
