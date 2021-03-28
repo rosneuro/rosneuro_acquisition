@@ -64,3 +64,7 @@ rosrun rosneuro_acquisition acquisition _devarg:=[DEVICE] _devtype:=[DEVTYPE] _f
  ~<name>/`get_info` (`rosneuro_msgs/GetAcquisitionInfo`)
   
   Get the configuration of the device
+  
+ 
+ ## Developing custom plugin
+ TODO
