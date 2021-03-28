@@ -8,4 +8,9 @@ rosneuro_acquisition has been tested with the following configuration:
 - **Ubuntu 20.04.02 LTS Focal Fossa** and **ROS Noetic**
 
 ## Usage
-The package acquires data from external devices and publishes it as NeuroFrame message (rosneuro_messages/NeuroFrame.msg). Each published message represents a chunk of data as `samples x channels`. This defines a framerate according to which the data is published to other modules. For instance, if the device provides data at 512 Hz (sampling rate) and the acquisition is set to have a framerate of 16 Hz, each NeuroFrame will contains 32 samples (x channels) of data. For more information about [NeuroFrame](https://github.com/rosneuro/rosneuro_messages), please refere to the related documentation.
+The package acquires data from external devices and publishes it as a **NeuroFrame** message ([rosneuro_msgs](https://github.com/rosneuro/rosneuro_msgs)). Each published message represents a chunk of data as `samples x channels`. This defines a **framerate** according to which the data is published to other modules. For instance, if the device provides data at 512 Hz (sampling rate) and the acquisition is set to have a framerate of 16 Hz, each **NeuroFrame** will contains 32 samples (x channels) of data. For more information about **NeuroFrame**, please refere to the [rosneuro_msgs](https://github.com/rosneuro/rosneuro_msgs) documentation.
+
+The following command can be used to launch the acquisition (**TODO: Check/change the arguments**):
+```
+rosrun rosneuro_acquisition acquisition _devarg:=[DEVICE] _devtype:=[DEVTYPE] _framerate:=[FRAMERATE] _samplerate:=[SAMPLERATE] _reopen:=[True/False] _autostart:=[True/False]
+```
