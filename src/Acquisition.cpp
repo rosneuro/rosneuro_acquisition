@@ -9,10 +9,12 @@ Acquisition::Acquisition(void) : p_nh_("~") {
 	this->topic_	 = "/neurodata"; 
 	this->autostart_ = false;
 	this->state_	 = Acquisition::IS_IDLE;
+	this->loader_.reset(new pluginlib::ClassLoader<Device>("rosneuro_acquisition", "rosneuro::Device"));
 }
 
 Acquisition::~Acquisition(void) {
-	delete this->dev_;
+	this->dev_.reset();
+	this->loader_.reset();
 }
 
 bool Acquisition::configure(void) {
@@ -20,9 +22,14 @@ bool Acquisition::configure(void) {
 	unsigned int devtypeId;
 	std::string  devtype;
 	
-	ros::param::param<std::string>("~devtype", devtype, "LSLDevice"); 
-	
-	this->dev_	   = FactoryDevice::get().createDevice(devtype);
+	ros::param::param<std::string>("~devtype", devtype, ""); 
+
+	try {
+		this->dev_ = this->loader_->createInstance(devtype);
+	} catch (pluginlib::PluginlibException& ex) {
+		ROS_ERROR("'%s' plugin failed to load: %s", devtype.c_str(), ex.what());
+	}
+		
 	
 	if(this->dev_ == nullptr) {
 		ROS_ERROR("Unknown device type: %s", devtype.c_str());

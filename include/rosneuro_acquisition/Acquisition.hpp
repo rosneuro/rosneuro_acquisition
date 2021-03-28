@@ -2,8 +2,8 @@
 #define ROSNEURO_ACQUISITION_HPP
 
 #include <ros/ros.h>
+#include <pluginlib/class_loader.h>
 #include <std_srvs/Empty.h>
-#include "rosneuro_acquisition/FactoryDevice.hpp"
 #include "rosneuro_acquisition/Device.hpp"
 #include "rosneuro_data/NeuroData.hpp"
 #include "rosneuro_data/NeuroDataTools.hpp"
@@ -147,7 +147,7 @@ class Acquisition {
 		unsigned int		state_;
 
 
-		Device*			dev_;
+		boost::shared_ptr<Device>	dev_;
 
 		std::string		devarg_;
 		std::string		devname_;
@@ -160,7 +160,7 @@ class Acquisition {
 		NeuroFrame	frame_;
 
 
-
+		std::unique_ptr<pluginlib::ClassLoader<Device>> loader_;
 };
 
 }
