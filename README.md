@@ -14,30 +14,21 @@ rosneuro_acquisition depends on the following @rosneuro packages:
 ## Usage
 The package acquires data from external devices and publishes it as a **NeuroFrame** message ([rosneuro_msgs](https://github.com/rosneuro/rosneuro_msgs)). Each published message represents a chunk of data as `samples x channels`. This defines a **framerate** according to which the data is published to other modules. For instance, if the device provides data at 512 Hz (sampling rate) and the acquisition is set to have a framerate of 16 Hz, each **NeuroFrame** will contains 32 samples (x channels) of data. For more information about **NeuroFrame**, please refere to the [rosneuro_msgs](https://github.com/rosneuro/rosneuro_msgs) documentation.
 
-The following command can be used to launch the acquisition (**TODO: Check/change the arguments**):
+The following command can be used to launch the acquisition:
 ```
-rosrun rosneuro_acquisition acquisition _devarg:=[DEVICE] _devtype:=[DEVTYPE] _framerate:=[FRAMERATE] _samplerate:=[SAMPLERATE] _reopen:=[True/False] _autostart:=[True/False]
+rosrun rosneuro_acquisition acquisition _plugin:=[PLUGIN] _framerate:=[FRAMERATE] [_reopen:=[True/False] _autostart:=[True/False]]
 ```
 
 ### Published Topics
 - /neurodata ([rosneuro_msgs/NeuroFrame](https://github.com/rosneuro/rosneuro_msgs))
 
 ### Parameters
-~<name>/`devarg` (`string`) 
-  
-  *TODO*
-  
-~<name>/`devtype` (`string`, default: "rosneuro::EGDDEvice") 
-  
-  Full name of the plugin to be loaded (e.g., rosneuro::EGDDevice, rosneuro::LSLDevice)
+~<name>/`plugin` (`string`) 
+  Fully-qualified type of the plugin to be loaded (e.g., `rosneuro::EGDDevice`)
 
-~<name>/`framerate` (`int`, default: 16) 
+~<name>/`framerate` (`int`) 
   
-  Framerate (in Hz) of the published NeuroFrame message (e.g., 32)
-
-~<name>/`samplerate` (`int`, default: depends on device) 
-  
-  Sampling rate (in Hz) of the acquisition device (if the device allows to set the sampling rate) (e.g., 512)
+  Framerate (in Hz) of the published NeuroFrame message (e.g., 16)
 
 ~<name>/`reopen` (`bool`, default: True) 
   
@@ -46,6 +37,8 @@ rosrun rosneuro_acquisition acquisition _devarg:=[DEVICE] _devtype:=[DEVTYPE] _f
 ~<name>/`autostart` (`bool`, default: True) 
   
   Automatically start the acquisition after launch
+  
+ Notice that other parameters may be required by the plugins. Check the related plugin documentation.
 
 ### Services
 
@@ -112,8 +105,9 @@ class PlugDevice : public Device {
 
 		PlugDevice(NeuroFrame* frame);
 		virtual ~DummyDevice(void);
-		bool Setup(float framerate);
-		bool Open(const std::string& devname, int samplerate);
+		bool Configure(NeuroFrame* frame, unsigned int framerate);
+		bool Setup(void);
+		bool Open(void);
 		bool Close(void);
 		bool Start(void);
 		bool Stop(void);
@@ -156,18 +150,23 @@ Now, let's create the implementatio of the plugin in: `rosneuro_acquisition_plug
 
 namespace rosneuro {
 
-PlugDevice::PlugDevice(NeuroFrame* frame) : Device(frame) {
+PlugDevice::PlugDevice(void) : Device() {
 	this->name_ = "PlugDevice";
 }
 
 PlugDevice::~PlugDevice(void) {}
 
-bool PlugDevice::Setup(float framerate) {
+bool PlugDevice::Configure(NeuroFrame* frame, unsigned int framerate {
+	printf("[%s] - Configuration done\n", this->name_.c_str());
+	return true;
+}
+
+bool PlugDevice::Setup(void) {
 	printf("[%s] - Setup done\n", this->name_.c_str());
 	return true;
 }
 
-bool PlugDevice::Open(const std::string& devname, int samplerate) {
+bool PlugDevice::Open(void) {
 	printf("[%s] - Device open\n", this->name_.c_str());
 	return true;
 }
@@ -260,5 +259,5 @@ rospack plugins --attrib=plugin rosneuro_acquisition
 ### Using the new plugin in the acquisition
 Finally, now it is possible to run the acquisition with the new plugin, as follows:
 ```
-rosrun rosneuro_acquisition acquisition _devtype:="rosneuro::PlugDevice" [Additional parameters]
+rosrun rosneuro_acquisition acquisition _plugin:="rosneuro::PlugDevice" [Additional parameters]
 ```
