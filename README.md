@@ -16,25 +16,25 @@ The package acquires data from external devices and publishes it as a **NeuroFra
 
 The following command can be used to launch the acquisition:
 ```
-rosrun rosneuro_acquisition acquisition _plugin:=[PLUGIN] _framerate:=[FRAMERATE] [_reopen:=[True/False] _autostart:=[True/False]]
+rosrun rosneuro_acquisition acquisition _plugin:=[PLUGIN] _framerate:=[FRAMERATE]
 ```
 
 ### Published Topics
 - /neurodata ([rosneuro_msgs/NeuroFrame](https://github.com/rosneuro/rosneuro_msgs))
 
 ### Parameters
-~<name>/`plugin` (`string`) 
+~<name>/`plugin` (`string`) [**mandatory**]
   Fully-qualified type of the plugin to be loaded (e.g., `rosneuro::EGDDevice`)
 
-~<name>/`framerate` (`int`) 
+~<name>/`framerate` (`int`) [**mandatory**]
   
   Framerate (in Hz) of the published NeuroFrame message (e.g., 16)
 
-~<name>/`reopen` (`bool`, default: True) 
+~<name>/`reopen` (`bool`, default: True) [optional]
   
   Try to automatically re-open the device if closed
 
-~<name>/`autostart` (`bool`, default: True) 
+~<name>/`autostart` (`bool`, default: True) [optional]
   
   Automatically start the acquisition after launch
   
