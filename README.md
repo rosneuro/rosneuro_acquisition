@@ -260,5 +260,5 @@ rospack plugins --attrib=plugin rosneuro_acquisition
 ### Using the new plugin in the acquisition
 Finally, now it is possible to run the acquisition with the new plugin, as follows:
 ```
-rosrun rosneuro_acquisition acquisition _plugin:="rosneuro::PlugDevice" [Additional parameters]
+rosrun rosneuro_acquisition acquisition _plugin:=rosneuro::PlugDevice _framerate:=16 [Additional parameters]
 ```
