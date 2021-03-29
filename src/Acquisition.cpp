@@ -20,40 +20,40 @@ Acquisition::~Acquisition(void) {
 bool Acquisition::configure(void) {
 
 	unsigned int devtypeId;
-	std::string  devtype;
-	
-	ros::param::param<std::string>("~devtype", devtype, ""); 
+	std::string  plugin;
 
-	try {
-		this->dev_ = this->loader_->createInstance(devtype);
-	} catch (pluginlib::PluginlibException& ex) {
-		ROS_ERROR("'%s' plugin failed to load: %s", devtype.c_str(), ex.what());
+	// Getting mandatory parameters from ROS
+	if(ros::param::get("~plugin", this->plugin_) == false) {
+		ROS_ERROR("Missing 'plugin' in the server. 'plugin' is a mandatory parameter");
+		return false;
 	}
-		
-	
-	if(this->dev_ == nullptr) {
-		ROS_ERROR("Unknown device type: %s", devtype.c_str());
+	if(ros::param::get("~framerate", this->framerate_) == false) {
+		ROS_ERROR("Missing 'framerate' in the server. 'framerate' is a mandatory parameter");
 		return false;
 	}
 
-	this->devname_ = this->dev_->GetName();
-	this->dev_->SetNeuroFrame(&this->frame_);
-	ROS_INFO("Acquisition correctly created the device: %s", this->devname_.c_str());
-
-	if(ros::param::get("~devarg", this->devarg_) == false) {
-		ROS_ERROR("Missing 'devarg' in the server. 'devarg' is a mandatory parameter");
-		return false;
-	}
-
-	
-	if(ros::param::get("~samplerate", this->samplerate_) == false) {
-		ROS_ERROR("Missing 'samplerate' in the server. 'samplerate' is a mandatory parameter");
-		return false;
-	}
-	
-	ros::param::param("~framerate", this->framerate_, 16.0f);
+	// Getting optional parameters from ROS
 	ros::param::param("~reopen", this->reopen_, true);
 	ros::param::param("~autostart", this->autostart_, true);
+
+	// Dynamically load the plugin
+	try {
+		this->dev_ = this->loader_->createInstance(this->plugin_);
+	} catch (pluginlib::PluginlibException& ex) {
+		ROS_ERROR("'%s' plugin failed to load: %s", this->plugin_.c_str(), ex.what());
+	}
+		
+
+	this->devname_ = this->dev_->GetName();
+	
+	if(this->dev_->Configure(&this->frame_, this->framerate_) == false) {
+		ROS_ERROR("Cannot configure the device");
+		return false;
+	}
+
+	ROS_INFO("Acquisition correctly created the device: %s", this->devname_.c_str());
+
+
 	
 	this->pub_ = this->p_nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, 1);
 	
@@ -82,21 +82,17 @@ bool Acquisition::Run(void) {
 	ROS_INFO("Acquisition correctly configured");
 
 	// Open the device
-	if(this->dev_->Open(this->devarg_, this->samplerate_) == false) {
-		ROS_ERROR("Cannot open the '%s' device with arg=%s and samplerate=%d Hz", this->devname_.c_str(), this->devarg_.c_str(), this->samplerate_);
+	if(this->dev_->Open() == false) {
 		return false;
 	}
-	ROS_INFO("'%s' device correctly opened with arg=%s and samplerate=%d Hz", this->devname_.c_str(), this->devarg_.c_str(), this->samplerate_);
 
 	// Configure device
-	if(this->dev_->Setup(this->framerate_) == false) {
-		ROS_ERROR("Cannot setup the '%s' device", this->devname_.c_str());
+	if(this->dev_->Setup() == false) {
 		return false;
 	}
-	ROS_INFO("'%s' device correctly configured", this->devname_.c_str());
 
 	// Store samplerate in the frame
-	this->frame_.sr = this->samplerate_;
+	//this->frame_.sr = this->samplerate_;
 
 	// Configure the message
 	if(NeuroDataTools::ConfigureNeuroMessage(this->frame_, this->msg_) == false) {
@@ -200,18 +196,14 @@ unsigned int Acquisition::on_device_down(void) {
 	this->dev_->Close();
 
 	// Re-opening the device
-	if(this->dev_->Open(this->devarg_, this->samplerate_) == false) {
-		ROS_ERROR("Cannot re-open the '%s' device with arg=%s and samplerate=%d Hz", this->devname_.c_str(), this->devarg_.c_str(), this->samplerate_);
+	if(this->dev_->Open() == false) {
 		return Acquisition::IS_QUIT;
 	}
-	ROS_INFO("'%s' device correctly re-opened with arg=%s and samplerate=%d Hz", this->devname_.c_str(), this->devarg_.c_str(), this->samplerate_);
 
 	// Re-configuring device
-	if(this->dev_->Setup(this->framerate_) == false) {
-		ROS_ERROR("Cannot re-setup the '%s' device", this->devname_.c_str());
+	if(this->dev_->Setup() == false) {
 		return Acquisition::IS_QUIT;
 	}
-	ROS_INFO("'%s' device correctly re-configured", this->devname_.c_str());
 	
 	// Re-starting the device
 	if(this->dev_->Start() == false) {

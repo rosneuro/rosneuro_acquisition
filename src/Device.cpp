@@ -17,9 +17,6 @@ Device::Device(NeuroFrame* frame)  {
 
 Device::~Device(void) {}
 
-void Device::SetNeuroFrame(NeuroFrame* frame) {
-	this->frame_ = frame;
-}
 
 std::string Device::GetName(void) {
 	return this->name_;

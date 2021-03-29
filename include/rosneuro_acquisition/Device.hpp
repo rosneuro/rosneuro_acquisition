@@ -40,7 +40,7 @@ class Device {
 		 */
 		virtual ~Device(void);
 
-		void SetNeuroFrame(NeuroFrame* frame);
+		virtual bool Configure(NeuroFrame* frame, unsigned int framerate) = 0;
 
 		/*! \brief      Set up the device
 		 *
@@ -48,7 +48,7 @@ class Device {
 		 *
 		 * \return     True if the set up is correctly performed, false otherwise
 		 */
-		virtual bool   Setup(float framerate) = 0;
+		virtual bool   Setup(void) = 0;
 
 		/*! \brief      Open the device
 		 *
@@ -57,7 +57,7 @@ class Device {
 		 *
 		 * \return     True if the device is correctly opened, false otherwise
 		 */
-		virtual bool   Open(const std::string& devname, int samplerate) = 0;
+		virtual bool   Open(void) = 0;
 
 		/*! \brief      Close the device
 		 *

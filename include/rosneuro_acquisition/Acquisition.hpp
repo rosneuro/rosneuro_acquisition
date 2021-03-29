@@ -149,10 +149,11 @@ class Acquisition {
 
 		boost::shared_ptr<Device>	dev_;
 
-		std::string		devarg_;
+		//std::string		devarg_;
 		std::string		devname_;
+		std::string		plugin_;
 		float			framerate_;
-		int				samplerate_;
+		//int				samplerate_;
 		bool			reopen_;
 		bool			autostart_;
 		
