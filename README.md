@@ -65,6 +65,26 @@ rosrun rosneuro_acquisition acquisition _devarg:=[DEVICE] _devtype:=[DEVTYPE] _f
   
   Get the configuration of the device
   
+ ## Supported devices
+ 
+ The currently supported devices and the related plugins are reported below:
+ 
+ | Device | Driver | Plugin |
+ |:------:|:-------:|:------:|
+ | GDF file | free | rosneuro::EGDDevice |
+ | BDF file | free | rosneuro::EGDDevice |
+ | Biosemi  | free | rosneuro::EGDDevice |
+ | Neurosky | free | rosneuro::EGDDevice |
+ | TobiIA   | free | rosneuro::EGDDevice |
+ | NeurOne  | free | rosneuro::EGDDevice |
+ | g.USBamp | proprietary | rosneuro::EGDDevice |
+ | gTecNet  | proprietary | rosneuro::EGDDevice |
+ | BBT      | proprietary | rosneuro::EGDDevice |
+ | Wearable Sensing | proprietary | rosneuro::EGDDevice |
+ | Cognionics Quick-20 | proprietary | rosneuro::EGDDevice |
+ | AntNeuro eego | proprietary | rosneuro::EGDDevice |
+ | LabStreaming Layer | free | rosneuro::LSLDevice |
+
  
  ## Developing custom plugin
  TODO
