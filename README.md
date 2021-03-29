@@ -218,7 +218,7 @@ find_package(catkin REQUIRED COMPONENTS
 			 pluginlib
 			 rosneuro_data
 			 rosneuro_msgs
-       rosneuro_acquisition)
+       			 rosneuro_acquisition)
 ```
 
 ### Making the plugin available in the ROSNeuro Toolchain
@@ -235,7 +235,7 @@ In the `library` tag, we need to set the relative path to the plugin library. In
 Then, we have to define the type of the plugin `rosneuro::PlugDevice` and of the base class `rosneuro::Device`. We can also add a human-readable description of the plugin. Notice that the value of type of plugin (`rosneuro::PlugDevice`) will be used as argument of the acquistion to dynamically load the desired plugin.
 
 To export the plugin, add to the `rosneuro_acqusition_plugin_plugdevice/package.xml` with the following lines:
-```
+```xml
   <export>
 	  <rosneuro_acquisition plugin="${prefix}/plugin_dummydev.xml"/>
   </export>
