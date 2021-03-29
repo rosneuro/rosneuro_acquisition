@@ -24,6 +24,7 @@ rosrun rosneuro_acquisition acquisition _plugin:=[PLUGIN] _framerate:=[FRAMERATE
 
 ### Parameters
 ~<name>/`plugin` (`string`) [**mandatory**]
+	
   Fully-qualified type of the plugin to be loaded (e.g., `rosneuro::EGDDevice`)
 
 ~<name>/`framerate` (`int`) [**mandatory**]
