@@ -205,6 +205,37 @@ size_t PlugDevice::GetAvailable(void) {
 ```
 As you probably notice, this is a dummy implementation. The real implementation will depends on the device API to open, close, start, stop, configure, and get samples from the amplifier. Notice, that if the device requires additional configuration parameters, the best solution is to use `ros::param` in the `rosneuro::PlugDevice::Setup()` method.
 
+### Details on the plugin methods
+The aforementioned methods must be implemented by the PlugDev class. Here some details on the methods. Please have a look to the code in the provided plugins.
+
+```cpp
+bool Configure(NeuroFrame* frame, unsigned int framerate);
+```
+The method is used to link the `NeuroFrame` in the plugin and to set the desired `framerate` as follows: `this->frame_ = frame;`, `this->framerate_ = framerate`. In addition, we suggest to use the method to getting additional parameters (specifically required by the plugin) from the ROS Parameter Server.
+
+```cpp
+bool Setup(void);
+```
+The method is used to setup the hardware device according to the configuration and to inizialize the NeuroFrame and the NeuroDataInfo. The hardware setup may include to set a desired samplerate or specific device's configurations. However, this is strictly device-specific. Notice that the method will be called after the device is open. 
+
+```cpp
+bool Open(void);
+bool Close(void);
+bool Start(void);
+bool Stop(void);
+```
+Methods to open, close, start or stop the device.
+
+```cpp
+size_t Get(void);
+```
+Method to retrieve new data from the device. The amount of data is equal to the number of samples (x channels) in the NeuroFrame. Notice that we assume that the function is blocking until the number required samples is available.
+
+```cpp
+size_t GetAvailable(void);
+```
+Method that returns the number of samples available from the device. 
+
 ### Building the plugin
 To build the plugin, just add the usual lines to the `rosneuro_acqusition_plugin_plugdevice/CMakeLists.txt` file:
 
