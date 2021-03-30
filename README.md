@@ -25,7 +25,7 @@ rosrun rosneuro_acquisition acquisition _plugin:=[PLUGIN] _framerate:=[FRAMERATE
 - /neurodata ([rosneuro_msgs/NeuroFrame](https://github.com/rosneuro/rosneuro_msgs))
 
 ### Parameters
-~<name>/`plugin` (`string`) [**mandatory**]
+~<name>/`plugin` (`std::string`) [**mandatory**]
 	
   Fully-qualified type of the plugin to be loaded (e.g., `rosneuro::EGDDevice`)
 
