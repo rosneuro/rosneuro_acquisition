@@ -11,8 +11,10 @@ rosneuro_acquisition depends on the following @rosneuro packages:
 - [rosneuro/rosneuro_msgs](https://github.com/rosneuro/rosneuro_msgs) 
 - [rosneuro/rosneuro_data](https://github.com/rosneuro/rosneuro_data) 
 
+Each plugin may require additional libraries. Please refer to the related plugin documentation.
+
 ## Usage
-The package acquires data from external devices and publishes it as a **NeuroFrame** message ([rosneuro_msgs](https://github.com/rosneuro/rosneuro_msgs)). Each published message represents a chunk of data as `samples x channels`. This defines a **framerate** according to which the data is published to other modules. For instance, if the device provides data at 512 Hz (sampling rate) and the acquisition is set to have a framerate of 16 Hz, each **NeuroFrame** will contains 32 samples (x channels) of data. For more information about **NeuroFrame**, please refere to the [rosneuro_msgs](https://github.com/rosneuro/rosneuro_msgs) documentation.
+The package acquires data from a device and publishes it as a **NeuroFrame** message ([rosneuro_msgs](https://github.com/rosneuro/rosneuro_msgs)). Each published message represents a chunk of data in the format `samples x channels`. The **NeuroFrame** message is published at a given **framerate**. For instance, if the sampling rate of the device is 512 Hz and the framerate is set at 16 Hz, each **NeuroFrame** will contains 32 samples (x channels) of data. For more information about **NeuroFrame**, please refere to the [rosneuro_msgs](https://github.com/rosneuro/rosneuro_msgs) documentation.
 
 The following command can be used to launch the acquisition:
 ```
@@ -39,7 +41,7 @@ rosrun rosneuro_acquisition acquisition _plugin:=[PLUGIN] _framerate:=[FRAMERATE
   
   Automatically start the acquisition after launch
   
- Notice that other parameters may be required by the plugins. Check the related plugin documentation.
+ Notice that other parameters may be required by the plugins. Please refer to the related plugin documentation.
 
 ### Services
 
