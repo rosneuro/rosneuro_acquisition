@@ -71,10 +71,15 @@ bool LSLDevice::Setup(float framerate) {
 	if(this->info_->nominal_srate() == lsl::IRREGULAR_RATE) {
 		std::cerr<<"[Error] - LSL device does not support irregular rate data stream"<<std::endl;
 		return false;
-	}
+	} 
 
 	// Getting number of samples in the frame
-	ns = (size_t)(float)sampling_rate/framerate;
+	ns = (size_t)((float)sampling_rate)/framerate;
+		
+	std::cout<<"Samplerate of the stream: "<<sampling_rate<<std::endl;
+	std::cout<<"Framerate of the acquisition: "<<framerate<<std::endl;
+	std::cout<<"Number of samples: "<<ns<<std::endl;
+	
 
 	// Getting number of channels from the stream
 	neeg = this->info_->channel_count();
