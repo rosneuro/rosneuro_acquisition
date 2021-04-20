@@ -18,9 +18,17 @@ The following command can be used to launch the acquisition:
 ```
 rosrun rosneuro_acquisition acquisition _plugin:=[PLUGIN] _framerate:=[FRAMERATE]
 ```
-**Example with eegdev plugin**
+**Example with eegdev plugin (with gUSBamp amplifier)**
 ```
 rosrun rosneuro_acquisition acquisition _plugin:=rosneuro::EGDDevice _framerate:=32 _devarg:=gtec _samplerate:=512
+```
+**Example with eegdev plugin (with GDF file)**
+```
+rosrun rosneuro_acquisition acquisition _plugin:=rosneuro::EGDDevice _framerate:=32 _devarg:=EEGFILE.gdf 
+```
+**Example with LSL plugin**
+```
+rosrun rosneuro_acquisition acquisition _plugin:=rosneuro::LSLDevice _framerate:=32 _stream_type:=EEG _stream_name:=obci_eeg1
 ```
 
 ### Published Topics
