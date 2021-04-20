@@ -18,6 +18,10 @@ The following command can be used to launch the acquisition:
 ```
 rosrun rosneuro_acquisition acquisition _plugin:=[PLUGIN] _framerate:=[FRAMERATE]
 ```
+**Example with eegdev plugin**
+```
+rosrun rosneuro_acquisition acquisition _plugin:=rosneuro::EGDDevice _framerate:=32 _devarg:=gtec _samplerate:=512
+```
 
 ### Published Topics
 - /neurodata ([rosneuro_msgs/NeuroFrame](https://github.com/rosneuro/rosneuro_msgs))
