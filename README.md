@@ -28,7 +28,7 @@ rosrun rosneuro_acquisition acquisition _plugin:=rosneuro::EGDDevice _framerate:
 ```
 **Example with LSL plugin**
 ```
-rosrun rosneuro_acquisition acquisition _plugin:=rosneuro::LSLDevice _framerate:=25 _stream_type:=EEG _stream_name:=obci_eeg1
+rosrun rosneuro_acquisition acquisition _plugin:=rosneuro::LSLDevice _framerate:=12.5 _stream_type:=EEG _stream_name:=obci_eeg1
 ```
 
 ### Published Topics
