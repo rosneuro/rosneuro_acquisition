@@ -13,6 +13,7 @@ Acquisition::Acquisition(void) : p_nh_("~") {
 }
 
 Acquisition::~Acquisition(void) {
+	this->dev_->Close();
 	this->dev_.reset();
 	this->loader_.reset();
 }
@@ -80,14 +81,16 @@ bool Acquisition::Run(void) {
 		return false;
 	}
 	ROS_INFO("Acquisition correctly configured");
-
+	
 	// Open the device
 	if(this->dev_->Open() == false) {
+		ROS_ERROR("Cannot open the device");
 		return false;
 	}
 
 	// Configure device
 	if(this->dev_->Setup() == false) {
+		ROS_ERROR("Cannot setup the device");
 		return false;
 	}
 
@@ -174,8 +177,9 @@ unsigned int Acquisition::on_device_started(void) {
 		this->pub_.publish(this->msg_);
 	}
 
-	if(asize > 0)
+	if(asize > 0) {
 		//ROS_WARN("'%s' device running late: Get/Available=%zd/%zd", this->devname_.c_str(), gsize, asize);
+	}
 		
 	return Acquisition::IS_STARTED;
 }
