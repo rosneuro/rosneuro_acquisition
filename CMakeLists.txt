@@ -55,3 +55,14 @@ target_link_libraries(acquisition rosneuro_acquisition)
 
 add_executable(test_plugin src/test_plugin.cpp)
 target_link_libraries(test_plugin rosneuro_acquisition)
+
+#################
+##   Install   ##
+#################
+install(TARGETS ${PROJECT_NAME}
+	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+install(TARGETS acquisition
+	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
