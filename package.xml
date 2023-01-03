@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>rosneuro_acquisition</name>
-  <version>1.0.1</version>
+  <version>1.0.0</version>
   <description>ROSNEURO Acquisition package to acquire Neural data from different devices</description>
   <author email="luca.tonin@dei.unipd.it">Luca Tonin</author>
   <maintainer email="luca.tonin@dei.unipd.it">Luca Tonin</maintainer>
