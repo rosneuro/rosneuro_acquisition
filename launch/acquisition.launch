@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- acquisition arguments -->
+	<arg name="plugin" default='rosneuro::EGDDevice'/>
+	<arg name="devarg" />
+	<arg name="framerate" default='16'/>
+	<arg name="samplerate" default='512'/>
+
+	<!-- acquisition node -->
+	<node name="acquisition" pkg="rosneuro_acquisition" type="acquisition" output="screen">
+  	  <param name="~plugin" 	  value="$(arg plugin)"/>
+  	  <param name="~devarg" 	  value="$(arg devarg)"/>
+  	  <param name="~samplerate" value="$(arg samplerate)"/>
+  	  <param name="~framerate"  value="$(arg framerate)"/>
+  	</node>
+
+</launch>
