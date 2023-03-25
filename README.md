@@ -1,6 +1,9 @@
-# ROSNeuro Acquisition package
+# ROS-Neuro Acquisition package
 
-The package provides a generic interface for acquiring data from different devices. The interace accepts plugins that can be independently developed and dynamically loaded. Currently, the package provides plugins for [eegdev](https://neuro.debian.net/pkgs/libeegdev0.html) and for [LabStreamingLayer (LSL)](https://github.com/sccn/labstreaminglayer) devices ([rosneuro/rosneuro_acquisition_plugins](https://github.com/rosneuro/rosneuro_acquisition_plugins)).
+The package provides a generic interface for acquiring data from different devices. The interace accepts plugins that can be independently developed and dynamically loaded. Currently, **ROS-Neuro** provides plugins for [eegdev](https://neuro.debian.net/pkgs/libeegdev0.html) and for [LabStreamingLayer (LSL)](https://github.com/sccn/labstreaminglayer) devices: 
+
+- [rosneuro/rosneuro_acquisition_eegdev](https://github.com/rosneuro/rosneuro_acquisition_eegdev) 
+- [rosneuro/rosneuro_acquisition_lsl](https://github.com/rosneuro/rosneuro_acquisition_lsl) 
 
 ## Requirements
 rosneuro_acquisition has been tested with the following configuration:
