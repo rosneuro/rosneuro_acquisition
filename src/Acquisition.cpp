@@ -10,6 +10,7 @@ Acquisition::Acquisition(void) : p_nh_("~") {
 	this->autostart_ = false;
 	this->state_	 = Acquisition::IS_IDLE;
 	this->loader_.reset(new pluginlib::ClassLoader<Device>("rosneuro_acquisition", "rosneuro::Device"));
+	this->neuroseq_  = 0;
 }
 
 Acquisition::~Acquisition(void) {
@@ -53,7 +54,6 @@ bool Acquisition::configure(void) {
 	}
 
 	ROS_INFO("Acquisition correctly created the device: %s", this->devname_.c_str());
-
 
 	
 	this->pub_ = this->p_nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, 1);
@@ -174,6 +174,8 @@ unsigned int Acquisition::on_device_started(void) {
 	} 
 		
 	if( NeuroDataTools::FromNeuroFrame(this->frame_, this->msg_) == true ) {
+		this->neuroseq_++;
+		this->msg_.neuroheader.seq = this->neuroseq_;
 		this->pub_.publish(this->msg_);
 	}
 

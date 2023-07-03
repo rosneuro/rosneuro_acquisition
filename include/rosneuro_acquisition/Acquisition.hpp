@@ -145,6 +145,7 @@ class Acquisition {
 		ros::ServiceServer	srv_info_;
 		std::string			topic_;
 		unsigned int		state_;
+		uint32_t 			neuroseq_;
 
 
 		boost::shared_ptr<Device>	dev_;
