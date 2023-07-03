@@ -2,13 +2,14 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rosneuro_acquisition)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
+set(ROSNEURO_MSGS_MINVERSION 1.5.0)
 find_package(catkin REQUIRED COMPONENTS 
 			 roscpp 
 			 std_msgs
 			 pluginlib
-			 rosneuro_msgs
 			 rosneuro_data)
+
+find_package(rosneuro_msgs ${ROSNEURO_MSGS_MINVERSION} REQUIRED)
 
 find_package(PkgConfig)
 
@@ -34,7 +35,7 @@ catkin_package(
 ## Build ##
 ###########
 
-include_directories(${catkin_INCLUDE_DIRS} include)
+include_directories(${catkin_INCLUDE_DIRS} ${rosneuro_msgs_INCLUDE_DIRS} include)
 
 add_library(${PROJECT_NAME}	
 			src/Device.cpp
@@ -45,6 +46,7 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 add_dependencies(${PROJECT_NAME} 
 				 ${catkin_EXPORTED_TARGETS}
+				 ${rosneuro_msgs_EXPORTED_TARGETS}
 )
 
 #################
