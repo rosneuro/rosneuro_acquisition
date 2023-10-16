@@ -52,7 +52,7 @@ add_dependencies(${PROJECT_NAME}
 #################
 ## Executables ##
 #################
-add_executable(acquisition src/acquisition.cpp)
+add_executable(acquisition src/main.cpp)
 target_link_libraries(acquisition rosneuro_acquisition)
 
 add_executable(test_plugin src/test_plugin.cpp)
