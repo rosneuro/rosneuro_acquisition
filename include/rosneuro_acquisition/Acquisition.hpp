@@ -2,9 +2,10 @@
 #define ROSNEURO_ACQUISITION_HPP
 
 #include <ros/ros.h>
+#include "gtest/gtest_prod.h"
 #include <pluginlib/class_loader.h>
 #include <std_srvs/Empty.h>
-#include "rosneuro_acquisition/Device.hpp"
+#include "Device.hpp"
 #include "rosneuro_data/NeuroData.hpp"
 #include "rosneuro_data/NeuroDataTools.hpp"
 #include "rosneuro_msgs/NeuroFrame.h"
@@ -48,7 +49,7 @@ class Acquisition {
 		 * \return     True if the configuration is performed correctly, false otherwise
 		 * 
 		 */
-		bool configure(void);
+		virtual bool configure(void);
 
 		/*! \brief      Run the acquisition
 		 *
@@ -163,6 +164,12 @@ class Acquisition {
 
 
 		std::unique_ptr<pluginlib::ClassLoader<Device>> loader_;
+
+        FRIEND_TEST(AcquisitionTestSuite, Initialization);
+        FRIEND_TEST(AcquisitionTestSuiteConf, Configure);
+        FRIEND_TEST(AcquisitionTestSuite, RunSuccess);
+        FRIEND_TEST(AcquisitionTestSuite, RunFailure);
+        FRIEND_TEST(AcquisitionTestSuite, RunFailureOpen);
 };
 
 }

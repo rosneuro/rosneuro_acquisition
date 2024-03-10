@@ -1,7 +1,7 @@
 #ifndef ROSNEURO_ACQUISITION_CPP
 #define ROSNEURO_ACQUISITION_CPP
 
-#include "rosneuro_acquisition/Acquisition.hpp"
+#include "Acquisition.hpp"
 
 namespace rosneuro {
 

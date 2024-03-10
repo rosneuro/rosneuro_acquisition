@@ -1,5 +1,5 @@
 #include <pluginlib/class_loader.h>
-#include <rosneuro_acquisition/Device.hpp>
+#include <Device.hpp>
 
 int main(int argc, char** argv)
 {

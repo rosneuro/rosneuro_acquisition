@@ -1,5 +1,5 @@
 #include <ros/ros.h>
-#include "rosneuro_acquisition/Acquisition.hpp"
+#include "Acquisition.hpp"
 
 int main(int argc, char** argv) {
 

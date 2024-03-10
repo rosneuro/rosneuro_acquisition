@@ -37,13 +37,16 @@ catkin_package(
 
 catkin_add_gtest(test_device test/test_device.cpp)
 catkin_add_gtest(test_acquisition test/test_acquisition.cpp)
+catkin_add_gtest(test_configuration test/test_configuration.cpp)
 target_link_libraries(test_device ${GTEST_BOTH_LIBRARIES} pthread gmock)
 target_link_libraries(test_acquisition ${GTEST_BOTH_LIBRARIES} pthread gmock)
+target_link_libraries(test_configuration ${GTEST_BOTH_LIBRARIES} pthread gmock)
 target_link_libraries(test_device ${PROJECT_NAME} ${catkin_LIBRARIES})
 target_link_libraries(test_acquisition ${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(test_configuration ${PROJECT_NAME} ${catkin_LIBRARIES})
 target_link_libraries(test_acquisition ${GTEST_BOTH_LIBRARIES} pthread gmock)
 include_directories(${GTEST_INCLUDE_DIRS} gmock pthread)
-include_directories(${catkin_INCLUDE_DIRS} ${rosneuro_msgs_INCLUDE_DIRS} include)
+include_directories(${catkin_INCLUDE_DIRS} ${rosneuro_msgs_INCLUDE_DIRS} include/${PROJECT_NAME}/)
 
 add_library(${PROJECT_NAME}	
 			src/Device.cpp

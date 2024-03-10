@@ -1,59 +1,63 @@
 #include "gtest/gtest.h"
-#include "rosneuro_acquisition/Device.hpp"
-
-class DeviceTest : public rosneuro::Device {
-public:
-    DeviceTest() : rosneuro::Device() {}
-    DeviceTest(rosneuro::NeuroFrame* frame) : rosneuro::Device(frame) {}
-    virtual ~DeviceTest() {}
-    virtual bool Configure(rosneuro::NeuroFrame* frame, unsigned int framerate) { return true; }
-    virtual bool Setup(void) { return true; }
-    virtual bool Open(void) { return true; }
-    virtual bool Close(void) { return true; }
-    virtual bool Start(void) { return true; }
-    virtual bool Stop(void) { return true; }
-    virtual size_t Get(void) { return 0; }
-    virtual size_t GetAvailable(void) { return 0; }
-};
+#include "Device.hpp"
 
 namespace rosneuro {
 
-TEST(DeviceTest, DefaultDeviceInfoConstructor) {
-    DeviceInfo info;
+class DeviceTest : public Device {
+    public:
+        DeviceTest() : Device() {}
+        DeviceTest(NeuroFrame* frame) : Device(frame) {}
+        virtual ~DeviceTest() {}
+        virtual bool Configure(NeuroFrame* frame, unsigned int framerate) { return true; }
+        virtual bool Setup(void) { return true; }
+        virtual bool Open(void) { return true; }
+        virtual bool Close(void) { return true; }
+        virtual bool Start(void) { return true; }
+        virtual bool Stop(void) { return true; }
+        virtual size_t Get(void) { return 0; }
+        virtual size_t GetAvailable(void) { return 0; }
+};
 
-    // check if info model and id are empty and string type
+class DeviceTestSuite : public ::testing::Test {
+    public:
+        DeviceTestSuite() {}
+        ~DeviceTestSuite() {}
+        void SetUp() { device = new DeviceTest(); }
+        void TearDown() { delete device; }
+        DeviceTest* device;
+        DeviceInfo info;
+};
+
+TEST_F(DeviceTestSuite, DefaultDeviceInfoConstructor) {
     EXPECT_EQ(info.model, "");
     EXPECT_EQ(info.id, "");
 }
 
-TEST(DeviceTest, DefaultConstructor) {
-    DeviceTest device;
-    EXPECT_EQ(device.GetName(), "undefined");
+TEST_F(DeviceTestSuite, DefaultConstructor) {
+    EXPECT_EQ(device->GetName(), "undefined");
 }
 
-TEST(DeviceTest, ParameterizedConstructor) {
+TEST_F(DeviceTestSuite, ParameterizedConstructor) {
     NeuroFrame frame;
-    DeviceTest device(&frame);
-    EXPECT_EQ(device.GetName(), "undefined");
+    device = new DeviceTest(&frame);
+    EXPECT_EQ(device->GetName(), "undefined");
 }
 
-TEST(DeviceTest, Destructor) {
-    DeviceTest* device = new DeviceTest;
-    EXPECT_NO_THROW(delete device);
+TEST_F(DeviceTestSuite, Destructor) {
+    DeviceTest* device_throw = new DeviceTest();
+    EXPECT_NO_THROW(delete device_throw);
 }
 
-TEST(DeviceTest, Who) {
-    DeviceTest device;
-    testing::internal::CaptureStdout();  // Redirect stdout for testing
-    device.Who();
+TEST_F(DeviceTestSuite, Who) {
+    testing::internal::CaptureStdout();
+    device->Who();
     std::string output = testing::internal::GetCapturedStdout();
     EXPECT_EQ(output, "[undefined] - undefined device\n");
 }
 
-TEST(DeviceTest, Dump) {
-    DeviceTest device;
-    testing::internal::CaptureStdout();  // Redirect stdout for testing
-    device.Dump();
+TEST_F(DeviceTestSuite, Dump) {
+    testing::internal::CaptureStdout();
+    device->Dump();
     std::string output = testing::internal::GetCapturedStdout();
     EXPECT_EQ(output, "[Dump] undefined info:\n |- Model:         \n |- Id:            \n");
 }

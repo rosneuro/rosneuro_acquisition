@@ -1,7 +1,6 @@
 #ifndef ROSNEURO_ACQUISITION_DEVICE_CPP
 #define ROSNEURO_ACQUISITION_DEVICE_CPP
-
-#include "rosneuro_acquisition/Device.hpp"
+#include "Device.hpp"
 
 namespace rosneuro {
 
