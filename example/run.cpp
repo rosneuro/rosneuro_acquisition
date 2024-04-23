@@ -2,14 +2,11 @@
 #include "Acquisition.hpp"
 
 int main(int argc, char** argv) {
-
-	
-	// ros initialization
 	ros::init(argc, argv, "acquisition");
 
 	rosneuro::Acquisition acquisition;
 
-	if(acquisition.Run() == false)
+	if(!acquisition.Run())
 		ROS_ERROR("Acquisition interrupted while running");
 
 	ros::shutdown();
