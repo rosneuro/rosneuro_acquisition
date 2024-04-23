@@ -137,6 +137,11 @@ class Acquisition {
 
 
 	private:
+        void advertise(void);
+        bool configureDevice(void);
+        bool setParams(void);
+        void startAcquisitionLoop(void);
+
 		ros::NodeHandle		nh_;
 		ros::NodeHandle		p_nh_;
 		ros::Publisher		pub_;
@@ -151,11 +156,9 @@ class Acquisition {
 
 		boost::shared_ptr<Device>	dev_;
 
-		//std::string		devarg_;
 		std::string		devname_;
 		std::string		plugin_;
 		float			framerate_;
-		//int				samplerate_;
 		bool			reopen_;
 		bool			autostart_;
 		
