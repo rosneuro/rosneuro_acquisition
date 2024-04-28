@@ -66,75 +66,19 @@ class Acquisition {
 		enum {IS_IDLE, IS_STARTED, IS_STOPPED, IS_DOWN, IS_QUIT};
 
 	private:
-		/*! \brief      Called on request start.
-		 *
-		 * \param      req   The request
-		 * \param      res   The response
-		 *
-		 * \return     True if acquisition is started, false otherwise
-		 */
 		bool on_request_start(std_srvs::Empty::Request& req,
 							  std_srvs::Empty::Response& res);
-
-		/*! \brief      Called on request stop.
-		 *
-		 * \param      req   The request
-		 * \param      res   The response
-		 *
-		 * \return     True if acquisition is stopped, false otherwise
-		 */
 		bool on_request_stop(std_srvs::Empty::Request& req,
 							 std_srvs::Empty::Response& res);
-
-		/*! \brief      Called on request quit.
-		 *
-		 * \param      req   The request
-		 * \param      res   The response
-		 *
-		 * \return     True
-		 */
 		bool on_request_quit(std_srvs::Empty::Request& req,
 							 std_srvs::Empty::Response& res);
-
-		/*! \brief      Called on request info.
-		 *
-		 * \param      req   The request
-		 * \param      res   The response
-		 *
-		 * \return     True
-		 */
 		bool on_request_info(rosneuro_msgs::GetAcquisitionInfo::Request& req,
 							 rosneuro_msgs::GetAcquisitionInfo::Response& res);
-
-		/*! \brief      Called when the device is idle.
-		 *
-		 * \return      Acquisition::IS_IDLE if autostart is false, Acquisition::IS_QUIT if the
-		 * 				device cannot be started, Acquisition::IS_STARTED otherwise
-		 */
 		unsigned int on_device_idle(void);
-
-		/*! \brief      Called when the device is started.
-		 *
-		 * \return      Acquisition::IS_DOWN if the device is down, Acquisition::IS_STARTED otherwise
-		 */
 		unsigned int on_device_started(void);
-
-		/*! \brief      Called when the device is stopped.
-		 *
-		 * \return      Acquisition::IS_STOPPED
-		 */
 		unsigned int on_device_stopped(void);
-
-		/*! \brief      Called on device requesting.
-		 */
 		unsigned int on_device_requesting(void);
-
-		/*! \brief      Called when the device is down.
-		 *
-		 * \return      Acquisition::IS_QUIT if the device cannot be reopened, Acquisition::IS_STARTED otherwise 
-		 */
 		unsigned int on_device_down(void);
-
 
 	private:
         void advertise(void);

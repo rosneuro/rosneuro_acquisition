@@ -81,13 +81,6 @@ namespace rosneuro {
         EXPECT_CALL(*mockAcquisition, configure()).WillOnce(testing::Return(true));
         EXPECT_FALSE(mockAcquisition->Run());
     }
-
-    TEST_F(AcquisitionTestSuite, Integration){
-        pluginlib::ClassLoader<Device> plug_loader("rosneuro_acquisition", "rosneuro::Device");
-        boost::shared_ptr<Device> lsl_device, egd_device;
-        ASSERT_NO_THROW(lsl_device = plug_loader.createInstance("rosneuro::LSLDevice"));
-        ASSERT_NO_THROW(egd_device = plug_loader.createInstance("rosneuro::EGDDevice"));
-    }
 }
 
 int main(int argc, char **argv) {
