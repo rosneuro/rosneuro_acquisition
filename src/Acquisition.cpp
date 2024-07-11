@@ -1,7 +1,7 @@
 #ifndef ROSNEURO_ACQUISITION_CPP
 #define ROSNEURO_ACQUISITION_CPP
 
-#include "rosneuro_acquisition/Acquisition.hpp"
+#include "Acquisition.hpp"
 
 namespace rosneuro {
 
@@ -20,138 +20,127 @@ Acquisition::~Acquisition(void) {
 }
 
 bool Acquisition::configure(void) {
+	if(!this->setParams()) return false;
 
-	unsigned int devtypeId;
-	std::string  plugin;
+	if(!this->configureDevice()) return false;
 
-	// Getting mandatory parameters from ROS
-	if(ros::param::get("~plugin", this->plugin_) == false) {
-		ROS_ERROR("Missing 'plugin' in the server. 'plugin' is a mandatory parameter");
-		return false;
-	}
-	if(ros::param::get("~framerate", this->framerate_) == false) {
-		ROS_ERROR("Missing 'framerate' in the server. 'framerate' is a mandatory parameter");
-		return false;
-	}
-
-	// Getting optional parameters from ROS
-	ros::param::param("~reopen", this->reopen_, true);
-	ros::param::param("~autostart", this->autostart_, true);
-
-	// Dynamically load the plugin
-	try {
-		this->dev_ = this->loader_->createInstance(this->plugin_);
-	} catch (pluginlib::PluginlibException& ex) {
-		ROS_ERROR("'%s' plugin failed to load: %s", this->plugin_.c_str(), ex.what());
-	}
-		
-
-	this->devname_ = this->dev_->GetName();
-	
-	if(this->dev_->Configure(&this->frame_, this->framerate_) == false) {
-		ROS_ERROR("Cannot configure the device");
-		return false;
-	}
-
-	ROS_INFO("Acquisition correctly created the device: %s", this->devname_.c_str());
-
-	
-	this->pub_ = this->p_nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, 1);
-	
-	this->srv_start_ = this->p_nh_.advertiseService("start", &Acquisition::on_request_start, this);
-	this->srv_stop_  = this->p_nh_.advertiseService("stop",  &Acquisition::on_request_stop, this);
-	this->srv_quit_  = this->p_nh_.advertiseService("quit",  &Acquisition::on_request_quit, this);
-	this->srv_info_  = this->p_nh_.advertiseService("get_info",  &Acquisition::on_request_info, this);
-
+    this->advertise();
 
 	return true;
 }
 
-bool Acquisition::Run(void) {
+bool Acquisition::setParams(void) {
+    if(!ros::param::get("~plugin", this->plugin_)) {
+        ROS_ERROR("Missing 'plugin' in the server. 'plugin' is a mandatory parameter");
+        return false;
+    }
 
-	bool quit = false;
-	
-	// Created by L.Tonin  <luca.tonin@epfl.ch> on 07/02/19 14:23:39
-	// Removed the sleep to not delay the acquisition
-	// //ros::Rate r(4096);
-	
-	// Configure acquisition
-	if(this->configure() == false) {
+    if(!ros::param::get("~framerate", this->framerate_)) {
+        ROS_ERROR("Missing 'framerate' in the server. 'framerate' is a mandatory parameter");
+        return false;
+    }
+
+    ros::param::param("~reopen", this->reopen_, true);
+    ros::param::param("~autostart", this->autostart_, true);
+
+    return true;
+}
+
+bool Acquisition::configureDevice(void) {
+    try {
+        this->dev_ = this->loader_->createInstance(this->plugin_);
+    } catch (pluginlib::PluginlibException& ex) {
+        ROS_ERROR("'%s' plugin failed to load: %s", this->plugin_.c_str(), ex.what());
+        return false;
+    }
+
+    this->devname_ = this->dev_->GetName();
+
+    if(!this->dev_->Configure(&this->frame_, this->framerate_)) {
+        ROS_ERROR("Cannot configure the device");
+        return false;
+    }
+
+    ROS_INFO("Acquisition correctly created the device: %s", this->devname_.c_str());
+    return true;
+}
+
+void Acquisition::advertise(void) {
+    this->pub_ = this->p_nh_.advertise<rosneuro_msgs::NeuroFrame>(this->topic_, 1);
+    this->srv_start_ = this->p_nh_.advertiseService("start", &Acquisition::on_request_start, this);
+    this->srv_stop_  = this->p_nh_.advertiseService("stop",  &Acquisition::on_request_stop, this);
+    this->srv_quit_  = this->p_nh_.advertiseService("quit",  &Acquisition::on_request_quit, this);
+    this->srv_info_  = this->p_nh_.advertiseService("get_info",  &Acquisition::on_request_info, this);
+}
+
+bool Acquisition::Run(void) {
+	if(!this->configure()) {
 		ROS_ERROR("Cannot configure the acquisition");
 		return false;
 	}
 	ROS_INFO("Acquisition correctly configured");
 	
-	// Open the device
-	if(this->dev_->Open() == false) {
+	if(!this->dev_->Open()) {
 		ROS_ERROR("Cannot open the device");
 		return false;
 	}
 
-	// Configure device
-	if(this->dev_->Setup() == false) {
+	if(!this->dev_->Setup()) {
 		ROS_ERROR("Cannot setup the device");
 		return false;
 	}
 
-	// Store samplerate in the frame
-	//this->frame_.sr = this->samplerate_;
-
-	// Configure the message
-	if(NeuroDataTools::ConfigureNeuroMessage(this->frame_, this->msg_) == false) {
+	if(!NeuroDataTools::ConfigureNeuroMessage(this->frame_, this->msg_)) {
 		ROS_WARN("Cannot configure NeuroFrame message");
 		return false;
 	}
 	ROS_INFO("NeuroFrame message correctly configured");
 
-	// Debug - Dump device configuration
 	this->frame_.eeg.dump();
 	this->frame_.exg.dump();
 	this->frame_.tri.dump();
 
-	ROS_INFO("Acquisition started");
-	while(this->nh_.ok() && quit == false) {
-	
-		ros::spinOnce();
-
-		// Created by L.Tonin  <luca.tonin@epfl.ch> on 07/02/19 14:23:01	
-		// Removed the sleep to not delay the acquisition
-		//r.sleep();
-
-		switch(this->state_) {
-			case Acquisition::IS_IDLE:
-				this->state_ = this->on_device_idle();
-				break;
-			case Acquisition::IS_STARTED:
-				this->state_ = this->on_device_started();
-				break;
-			case Acquisition::IS_STOPPED:
-				this->state_ = this->on_device_stopped();
-				break;
-			case Acquisition::IS_DOWN:
-				this->state_ = this->on_device_down();
-				break;
-			case Acquisition::IS_QUIT:
-				quit = true;
-				break;
-			default:
-				break;
-		}
-
-	}
-	ROS_INFO("Acquisition closed");
+	this->startAcquisitionLoop();
 
 	return true;
 }
 
-unsigned int Acquisition::on_device_idle(void) {
+void Acquisition::startAcquisitionLoop(void){
+    bool quit = false;
+    ROS_INFO("Acquisition started");
+    while(this->nh_.ok() && !quit) {
+        ros::spinOnce();
+        switch(this->state_) {
+            case Acquisition::IS_IDLE:
+                this->state_ = this->on_device_idle();
+                break;
+            case Acquisition::IS_STARTED:
+                this->state_ = this->on_device_started();
+                break;
+            case Acquisition::IS_STOPPED:
+                this->state_ = this->on_device_stopped();
+                break;
+            case Acquisition::IS_DOWN:
+                this->state_ = this->on_device_down();
+                break;
+            case Acquisition::IS_QUIT:
+                quit = true;
+                break;
+            default:
+                break;
+        }
 
-	if(this->autostart_ == false) {
+    }
+    ROS_INFO("Acquisition closed");
+}
+
+unsigned int Acquisition::on_device_idle(void) {
+	if(!this->autostart_) {
 		ROS_WARN_ONCE("'%s' device idle. Waiting for start", this->devname_.c_str());
 		return Acquisition::IS_IDLE;
 	}
 
-	if(this->dev_->Start() == false) {
+	if(!this->dev_->Start()) {
 		ROS_ERROR("Cannot start the '%s' device", this->devname_.c_str());
 		return Acquisition::IS_QUIT;
 	}
@@ -160,27 +149,16 @@ unsigned int Acquisition::on_device_idle(void) {
 }
 
 unsigned int Acquisition::on_device_started(void) {
-	size_t gsize = -1;
-	size_t asize = -1;
-
-
-	gsize = this->dev_->Get();
-	asize = this->dev_->GetAvailable();
-
 	this->msg_.header.stamp = ros::Time::now();
 	
-	if(gsize == (size_t)-1) {
+	if(this->dev_->Get() == (size_t)-1) {
 		return Acquisition::IS_DOWN;
 	} 
 		
-	if( NeuroDataTools::FromNeuroFrame(this->frame_, this->msg_) == true ) {
+	if(NeuroDataTools::FromNeuroFrame(this->frame_, this->msg_)) {
 		this->neuroseq_++;
 		this->msg_.neuroheader.seq = this->neuroseq_;
 		this->pub_.publish(this->msg_);
-	}
-
-	if(asize > 0) {
-		//ROS_WARN("'%s' device running late: Get/Available=%zd/%zd", this->devname_.c_str(), gsize, asize);
 	}
 		
 	return Acquisition::IS_STARTED;
@@ -194,25 +172,21 @@ unsigned int Acquisition::on_device_down(void) {
 
 	ROS_WARN("'%s' device is down", this->devname_.c_str());
 
-	if(this->reopen_ == false) {
+	if(!this->reopen_) {
 		return Acquisition::IS_QUIT;
 	}
 
-	// Closing the device
 	this->dev_->Close();
 
-	// Re-opening the device
-	if(this->dev_->Open() == false) {
+	if(!this->dev_->Open()) {
 		return Acquisition::IS_QUIT;
 	}
 
-	// Re-configuring device
-	if(this->dev_->Setup() == false) {
+	if(!this->dev_->Setup()) {
 		return Acquisition::IS_QUIT;
 	}
 	
-	// Re-starting the device
-	if(this->dev_->Start() == false) {
+	if(!this->dev_->Start()) {
 		ROS_ERROR("Cannot re-start the '%s' device", this->devname_.c_str());
 		return Acquisition::IS_QUIT;
 	}
@@ -220,7 +194,6 @@ unsigned int Acquisition::on_device_down(void) {
 
 	return Acquisition::IS_STARTED;
 }
-
 
 bool Acquisition::on_request_start(std_srvs::Empty::Request& req,
 								   std_srvs::Empty::Response& res) {
@@ -232,7 +205,7 @@ bool Acquisition::on_request_start(std_srvs::Empty::Request& req,
 		return true;
 	} 
 	
-	if( this->dev_->Start() == false) {
+	if(!this->dev_->Start()) {
 		ROS_ERROR("Cannot start the '%s' device", this->devname_.c_str());
 		this->state_ = Acquisition::IS_QUIT;
 		return false;
@@ -259,7 +232,7 @@ bool Acquisition::on_request_stop(std_srvs::Empty::Request& req,
 		return true;
 	}
 
-	if( this->dev_->Stop() == false) {
+	if(!this->dev_->Stop()) {
 		ROS_ERROR("Cannot stop the '%s' device", this->devname_.c_str());
 		this->state_ = Acquisition::IS_QUIT;
 		return false;
@@ -273,10 +246,9 @@ bool Acquisition::on_request_stop(std_srvs::Empty::Request& req,
 
 bool Acquisition::on_request_quit(std_srvs::Empty::Request& req,
 								  std_srvs::Empty::Response& res) {
-
 	ROS_WARN("Requested '%s' device to quit", this->devname_.c_str());
 
-	if(this->dev_->Close() == false) {
+	if(!this->dev_->Close()) {
 		ROS_ERROR("Cannot close the '%s' device", this->devname_.c_str());
 		this->state_ = Acquisition::IS_QUIT;
 	}
@@ -289,16 +261,13 @@ bool Acquisition::on_request_quit(std_srvs::Empty::Request& req,
 bool Acquisition::on_request_info(rosneuro_msgs::GetAcquisitionInfo::Request& req,
 								  rosneuro_msgs::GetAcquisitionInfo::Response& res) {
 	
-	
-	//// Configure info messages
-	NeuroDataTools::ConfigureNeuroMessage(this->frame_, res.frame); 
+	NeuroDataTools::ConfigureNeuroMessage(this->frame_, res.frame);
 
 	res.device_model = this->dev_->devinfo.model;
 	res.device_id    = this->dev_->devinfo.id;
 
 	res.result = true;
 	return true;
-
 }
 
 }

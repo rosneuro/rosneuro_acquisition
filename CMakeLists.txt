@@ -10,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
 			 rosneuro_data)
 
 find_package(rosneuro_msgs ${ROSNEURO_MSGS_MINVERSION} REQUIRED)
-
+find_package(GTest REQUIRED)
 find_package(PkgConfig)
 
 SET(CMAKE_BUILD_TYPE RelWithDebInfo)
@@ -30,12 +30,26 @@ catkin_package(
   DEPENDS
 )
 
+###########
+## Test  ##
+###########
+
+catkin_add_gtest(test_device test/TestDevice.cpp)
+catkin_add_gtest(test_acquisition test/TestAcquisition.cpp)
+catkin_add_gtest(test_configuration test/TestConfiguration.cpp)
+target_link_libraries(test_device ${GTEST_BOTH_LIBRARIES} pthread gmock)
+target_link_libraries(test_acquisition ${GTEST_BOTH_LIBRARIES} pthread gmock)
+target_link_libraries(test_configuration ${GTEST_BOTH_LIBRARIES} pthread gmock)
+target_link_libraries(test_device ${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(test_acquisition ${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(test_configuration ${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(test_acquisition ${GTEST_BOTH_LIBRARIES} pthread gmock)
+include_directories(${GTEST_INCLUDE_DIRS} gmock pthread)
+include_directories(${catkin_INCLUDE_DIRS} ${rosneuro_msgs_INCLUDE_DIRS} include/${PROJECT_NAME}/)
 
 ###########
 ## Build ##
 ###########
-
-include_directories(${catkin_INCLUDE_DIRS} ${rosneuro_msgs_INCLUDE_DIRS} include)
 
 add_library(${PROJECT_NAME}	
 			src/Device.cpp
@@ -52,15 +66,17 @@ add_dependencies(${PROJECT_NAME}
 #################
 ## Executables ##
 #################
-add_executable(acquisition src/acquisition.cpp)
+
+add_executable(acquisition example/run.cpp)
 target_link_libraries(acquisition rosneuro_acquisition)
 
-add_executable(test_plugin src/test_plugin.cpp)
+add_executable(test_plugin example/example_plugin.cpp)
 target_link_libraries(test_plugin rosneuro_acquisition)
 
 #################
 ##   Install   ##
 #################
+
 install(TARGETS ${PROJECT_NAME}
 	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )

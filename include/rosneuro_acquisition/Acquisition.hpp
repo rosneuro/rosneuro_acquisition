@@ -2,9 +2,10 @@
 #define ROSNEURO_ACQUISITION_HPP
 
 #include <ros/ros.h>
+#include "gtest/gtest_prod.h"
 #include <pluginlib/class_loader.h>
 #include <std_srvs/Empty.h>
-#include "rosneuro_acquisition/Device.hpp"
+#include "Device.hpp"
 #include "rosneuro_data/NeuroData.hpp"
 #include "rosneuro_data/NeuroDataTools.hpp"
 #include "rosneuro_msgs/NeuroFrame.h"
@@ -48,7 +49,7 @@ class Acquisition {
 		 * \return     True if the configuration is performed correctly, false otherwise
 		 * 
 		 */
-		bool configure(void);
+		virtual bool configure(void);
 
 		/*! \brief      Run the acquisition
 		 *
@@ -65,77 +66,26 @@ class Acquisition {
 		enum {IS_IDLE, IS_STARTED, IS_STOPPED, IS_DOWN, IS_QUIT};
 
 	private:
-		/*! \brief      Called on request start.
-		 *
-		 * \param      req   The request
-		 * \param      res   The response
-		 *
-		 * \return     True if acquisition is started, false otherwise
-		 */
 		bool on_request_start(std_srvs::Empty::Request& req,
 							  std_srvs::Empty::Response& res);
-
-		/*! \brief      Called on request stop.
-		 *
-		 * \param      req   The request
-		 * \param      res   The response
-		 *
-		 * \return     True if acquisition is stopped, false otherwise
-		 */
 		bool on_request_stop(std_srvs::Empty::Request& req,
 							 std_srvs::Empty::Response& res);
-
-		/*! \brief      Called on request quit.
-		 *
-		 * \param      req   The request
-		 * \param      res   The response
-		 *
-		 * \return     True
-		 */
 		bool on_request_quit(std_srvs::Empty::Request& req,
 							 std_srvs::Empty::Response& res);
-
-		/*! \brief      Called on request info.
-		 *
-		 * \param      req   The request
-		 * \param      res   The response
-		 *
-		 * \return     True
-		 */
 		bool on_request_info(rosneuro_msgs::GetAcquisitionInfo::Request& req,
 							 rosneuro_msgs::GetAcquisitionInfo::Response& res);
-
-		/*! \brief      Called when the device is idle.
-		 *
-		 * \return      Acquisition::IS_IDLE if autostart is false, Acquisition::IS_QUIT if the
-		 * 				device cannot be started, Acquisition::IS_STARTED otherwise
-		 */
 		unsigned int on_device_idle(void);
-
-		/*! \brief      Called when the device is started.
-		 *
-		 * \return      Acquisition::IS_DOWN if the device is down, Acquisition::IS_STARTED otherwise
-		 */
 		unsigned int on_device_started(void);
-
-		/*! \brief      Called when the device is stopped.
-		 *
-		 * \return      Acquisition::IS_STOPPED
-		 */
 		unsigned int on_device_stopped(void);
-
-		/*! \brief      Called on device requesting.
-		 */
 		unsigned int on_device_requesting(void);
-
-		/*! \brief      Called when the device is down.
-		 *
-		 * \return      Acquisition::IS_QUIT if the device cannot be reopened, Acquisition::IS_STARTED otherwise 
-		 */
 		unsigned int on_device_down(void);
 
-
 	private:
+        void advertise(void);
+        bool configureDevice(void);
+        bool setParams(void);
+        void startAcquisitionLoop(void);
+
 		ros::NodeHandle		nh_;
 		ros::NodeHandle		p_nh_;
 		ros::Publisher		pub_;
@@ -150,11 +100,9 @@ class Acquisition {
 
 		boost::shared_ptr<Device>	dev_;
 
-		//std::string		devarg_;
 		std::string		devname_;
 		std::string		plugin_;
 		float			framerate_;
-		//int				samplerate_;
 		bool			reopen_;
 		bool			autostart_;
 		
@@ -163,6 +111,12 @@ class Acquisition {
 
 
 		std::unique_ptr<pluginlib::ClassLoader<Device>> loader_;
+
+        FRIEND_TEST(AcquisitionTestSuite, Initialization);
+        FRIEND_TEST(AcquisitionTestSuiteConf, Configure);
+        FRIEND_TEST(AcquisitionTestSuite, RunSuccess);
+        FRIEND_TEST(AcquisitionTestSuite, RunFailure);
+        FRIEND_TEST(AcquisitionTestSuite, RunFailureOpen);
 };
 
 }
